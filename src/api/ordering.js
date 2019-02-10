@@ -12,15 +12,28 @@ const useGrpc = func => {
   const [state, setState] = useState({
     data: [],
     loading: true,
+    error: false,
   });
 
-  useEffect(() => {
-    func.then(data => {
+  const getData = async () => {
+    try {
+      const data = await func;
       setState({
         data: data,
         loading: false,
+        error: false,
       });
-    });
+    } catch (err) {
+      setState({
+        data: [],
+        loading: false,
+        error: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    getData();
   }, []);
 
   return state;
