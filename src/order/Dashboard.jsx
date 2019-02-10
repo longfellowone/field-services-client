@@ -1,15 +1,18 @@
 import React from 'react';
-import { useGrpc, getOrders } from '../api/ordering';
+import { useGrpc, findOrders } from '../api/ordering';
+import Moment from 'react-moment';
 
 export const Dashboard = id => {
-  const { data, loading, error } = useGrpc(getOrders(id));
+  const { data, loading, error } = useGrpc(findOrders(id));
   console.log(data, loading, error);
 
   return (
     <>
       <div>Dashboard</div>
       {data.map(order => (
-        <div key={order.orderId}>{order.date}</div>
+        <div key={order.orderId}>
+          <Moment date={order.date} unix />
+        </div>
       ))}
     </>
   );

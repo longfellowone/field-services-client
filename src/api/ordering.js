@@ -24,10 +24,8 @@ const useGrpc = func => {
         error: false,
       });
     } catch (err) {
-      setState({
-        data: [],
-        loading: false,
-        error: true,
+      setState(prevState => {
+        return { ...prevState, ...{ loading: false, error: true } };
       });
     }
   };
@@ -39,7 +37,7 @@ const useGrpc = func => {
   return state;
 };
 
-const getOrders = id => {
+const findOrders = id => {
   return new Promise((resolve, reject) => {
     const request = new FindProjectOrderDatesRequest();
     request.setProjectId('pid1');
@@ -53,4 +51,4 @@ const getOrders = id => {
   });
 };
 
-export { useGrpc, getOrders };
+export { useGrpc, findOrders };
