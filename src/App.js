@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
-import { Order } from './Order/Order';
+import { Order } from './order/Order';
 
 const Home = () => {
   return (
