@@ -15,7 +15,7 @@ export const Order = ({ match }) => {
       <Route
         path={match.url + '/'}
         exact
-        render={() => <Dashboard client={client} />}
+        render={() => <Dashboard client={client} id={match.url} />}
       />
       {/* <Route path={match.url + '/new'} component={NewOrder} />
       <Route path={match.url + '/receive'} component={ReceiveOrder} /> */}
