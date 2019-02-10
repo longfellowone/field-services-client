@@ -8,22 +8,36 @@ const client = new OrderingClient(
   null,
 );
 
-const getOrders = id => {
-  const [data, setData] = useState([]);
+const useGrpc = func => {
+  const [state, setState] = useState({
+    data: [],
+    loading: true,
+  });
 
   useEffect(() => {
+    func.then(data => {
+      setState({
+        data: data,
+        loading: false,
+      });
+    });
+  }, []);
+
+  return state;
+};
+
+const getOrders = id => {
+  return new Promise((resolve, reject) => {
     const request = new FindProjectOrderDatesRequest();
     request.setProjectId('pid1');
 
     client.findProjectOrderDates(request, {}, (err, response) => {
       if (err) {
-        setData(err);
+        return reject(err);
       }
-      setData(response.toObject().ordersList.map(order => order));
+      resolve(response.toObject().ordersList.map(order => order));
     });
-  }, []);
-
-  return data;
+  });
 };
 
-export { getOrders };
+export { useGrpc, getOrders };

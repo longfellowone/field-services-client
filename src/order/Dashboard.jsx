@@ -1,14 +1,14 @@
 import React from 'react';
-import { getOrders } from '../api/ordering';
+import { useGrpc, getOrders } from '../api/ordering';
 
 export const Dashboard = id => {
-  const orders = getOrders(id);
-  console.log(orders);
+  const { data, loading } = useGrpc(getOrders(id));
+  console.log(data, loading);
 
   return (
     <>
       <div>Dashboard</div>
-      {orders.map(order => (
+      {data.map(order => (
         <div key={order.orderId}>{order.date}</div>
       ))}
     </>
