@@ -1,9 +1,9 @@
 import React from 'react';
-import { useErrorLoader, findOrders } from '../api/ordering';
+import { useErrorLoading, findOrders } from '../api/ordering';
 import Moment from 'react-moment';
 
 export const Dashboard = id => {
-  const [orders, loading, error] = useErrorLoader(findOrders, { pid: 'pid1' });
+  const [orders, error, loading] = useErrorLoading(findOrders, { pid: 'pid1' });
   console.log(orders, loading, error);
 
   return (

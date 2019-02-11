@@ -8,7 +8,7 @@ const client = new OrderingClient(
   null,
 );
 
-export const useErrorLoader = (func, opts) => {
+export const useErrorLoading = (func, opts) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -17,7 +17,8 @@ export const useErrorLoader = (func, opts) => {
     setData(data);
     setLoading(false);
   };
-  const err = () => {
+  const err = err => {
+    console.log(err);
     setError(true);
     setLoading(false);
   };
@@ -26,7 +27,7 @@ export const useErrorLoader = (func, opts) => {
     func(success, err, opts);
   }, []);
 
-  return [data, loading, error];
+  return [data, error, loading];
 };
 
 export const findOrders = (success, error, opts) => {
