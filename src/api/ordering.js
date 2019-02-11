@@ -8,7 +8,7 @@ const client = new OrderingClient(
   null,
 );
 
-const useGrpc = func => {
+const useErrorsLoading = func => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -28,11 +28,11 @@ const useGrpc = func => {
     getData();
   }, []);
 
-  return { data, loading, error };
+  return [data, loading, error];
 };
 
-const findOrders = id => {
-  return new Promise((resolve, reject) => {
+const useFindOrders = id => {
+  const data = new Promise((resolve, reject) => {
     const request = new FindProjectOrderDatesRequest();
     request.setProjectId('pid1');
 
@@ -43,6 +43,7 @@ const findOrders = id => {
       resolve(response.toObject().ordersList.map(order => order));
     });
   });
+  return useErrorsLoading(data);
 };
 
-export { useGrpc, findOrders };
+export { useFindOrders };

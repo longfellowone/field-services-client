@@ -1,9 +1,9 @@
 import React from 'react';
-import { useGrpc, findOrders } from '../api/ordering';
+import { useFindOrders } from '../api/ordering';
 import Moment from 'react-moment';
 
 export const Dashboard = id => {
-  const { data, loading, error } = useGrpc(findOrders(id));
+  const [data, loading, error] = useFindOrders(id);
   console.log(data, loading, error);
 
   return (
@@ -11,11 +11,9 @@ export const Dashboard = id => {
       <div>New Order</div>
       <br />
       {data.map(order => (
-        <div>
-          <a key={order.orderId} href={order.orderId}>
-            <Moment date={order.date} format="MMMM Do YYYY h:mma" unix />
-          </a>
-        </div>
+        <a key={order.orderId} href={order.orderId} className="flex">
+          <Moment date={order.date} format="MMMM Do YYYY h:mma" unix />
+        </a>
       ))}
     </>
   );
