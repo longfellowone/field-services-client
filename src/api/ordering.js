@@ -8,42 +8,23 @@ const client = new OrderingClient(
   null,
 );
 
-const useErrorsLoading = func => {
+export const useFindOrders = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  const getData = async () => {
-    try {
-      const data = await func;
-      setData(data);
-      setLoading(false);
-    } catch (err) {
-      setError(false);
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    getData();
+    findOrders(successResponse => {
+      setData(successResponse);
+    });
   }, []);
 
-  return [data, loading, error];
+  return [data];
 };
 
-const useFindOrders = id => {
-  const data = new Promise((resolve, reject) => {
-    const request = new FindProjectOrderDatesRequest();
-    request.setProjectId('pid1');
+export const findOrders = successCallback => {
+  const request = new FindProjectOrderDatesRequest();
+  request.setProjectId('pid1');
 
-    client.findProjectOrderDates(request, {}, (err, response) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(response.toObject().ordersList.map(order => order));
-    });
+  client.findProjectOrderDates(request, {}, (error, response) => {
+    successCallback(response.toObject().ordersList.map(order => order));
   });
-  return useErrorsLoading(data);
 };
-
-export { useFindOrders };

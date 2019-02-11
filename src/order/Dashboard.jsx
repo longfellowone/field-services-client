@@ -3,8 +3,8 @@ import { useFindOrders } from '../api/ordering';
 import Moment from 'react-moment';
 
 export const Dashboard = id => {
-  const [data, loading, error] = useFindOrders(id);
-  console.log(data, loading, error);
+  const [data] = useFindOrders(id);
+  console.log(data);
 
   return (
     <>
