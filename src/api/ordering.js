@@ -8,23 +8,35 @@ const client = new OrderingClient(
   null,
 );
 
-export const useFindOrders = () => {
+export const useErrorLoader = (func, opts) => {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    findOrders(successResponse => {
-      setData(successResponse);
-    });
+    func(
+      successResponse => {
+        setData(successResponse);
+        setLoading(false);
+      },
+      () => {
+        setError(true);
+        setLoading(false);
+      },
+      opts,
+    );
   }, []);
 
-  return [data];
+  return [data, loading, error];
 };
 
-export const findOrders = successCallback => {
+export const findOrders = (successCallback, errorCallback, opts) => {
   const request = new FindProjectOrderDatesRequest();
-  request.setProjectId('pid1');
+  request.setProjectId(opts.pid);
 
   client.findProjectOrderDates(request, {}, (error, response) => {
-    successCallback(response.toObject().ordersList.map(order => order));
+    error
+      ? errorCallback(error)
+      : successCallback(response.toObject().ordersList.map(order => order));
   });
 };
