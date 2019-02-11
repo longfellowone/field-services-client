@@ -30,9 +30,9 @@ export const useErrorLoading = (func, opts) => {
   return [data, error, loading];
 };
 
-export const findOrders = (success, error, opts) => {
+export const findOrders = (success, error, { pid }) => {
   const request = new FindProjectOrderDatesRequest();
-  request.setProjectId(opts.pid);
+  request.setProjectId(pid);
 
   client.findProjectOrderDates(request, {}, (err, response) => {
     err
