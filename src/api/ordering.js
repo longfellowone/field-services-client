@@ -13,18 +13,17 @@ export const useErrorLoader = (func, opts) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const success = data => {
+    setData(data);
+    setLoading(false);
+  };
+  const err = () => {
+    setError(true);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    func(
-      successResponse => {
-        setData(successResponse);
-        setLoading(false);
-      },
-      () => {
-        setError(true);
-        setLoading(false);
-      },
-      opts,
-    );
+    func(success, err, opts);
   }, []);
 
   return [data, loading, error];
@@ -35,7 +34,7 @@ export const findOrders = (success, error, opts) => {
   request.setProjectId(opts.pid);
 
   client.findProjectOrderDates(request, {}, (err, response) => {
-    error
+    err
       ? error(err)
       : success(response.toObject().ordersList.map(order => order));
   });
