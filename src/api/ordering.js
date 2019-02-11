@@ -9,24 +9,18 @@ const client = new OrderingClient(
 );
 
 const useGrpc = func => {
-  const [state, setState] = useState({
-    data: [],
-    loading: true,
-    error: false,
-  });
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const getData = async () => {
     try {
       const data = await func;
-      setState({
-        data: data,
-        loading: false,
-        error: false,
-      });
+      setData(data);
+      setLoading(false);
     } catch (err) {
-      setState(prevState => {
-        return { ...prevState, ...{ loading: false, error: true } };
-      });
+      setError(false);
+      setLoading(false);
     }
   };
 
@@ -34,7 +28,7 @@ const useGrpc = func => {
     getData();
   }, []);
 
-  return state;
+  return { data, loading, error };
 };
 
 const findOrders = id => {

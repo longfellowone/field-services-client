@@ -8,10 +8,13 @@ export const Dashboard = id => {
 
   return (
     <>
-      <div>Dashboard</div>
+      <div>New Order</div>
+      <br />
       {data.map(order => (
-        <div key={order.orderId}>
-          <Moment date={order.date} unix />
+        <div>
+          <a key={order.orderId} href={order.orderId}>
+            <Moment date={order.date} format="MMMM Do YYYY h:mma" unix />
+          </a>
         </div>
       ))}
     </>
