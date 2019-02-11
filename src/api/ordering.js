@@ -30,13 +30,13 @@ export const useErrorLoader = (func, opts) => {
   return [data, loading, error];
 };
 
-export const findOrders = (successCallback, errorCallback, opts) => {
+export const findOrders = (success, error, opts) => {
   const request = new FindProjectOrderDatesRequest();
   request.setProjectId(opts.pid);
 
-  client.findProjectOrderDates(request, {}, (error, response) => {
+  client.findProjectOrderDates(request, {}, (err, response) => {
     error
-      ? errorCallback(error)
-      : successCallback(response.toObject().ordersList.map(order => order));
+      ? error(err)
+      : success(response.toObject().ordersList.map(order => order));
   });
 };
