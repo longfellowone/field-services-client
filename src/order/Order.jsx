@@ -5,8 +5,8 @@ const ItemList = ({ items }) => {
   return items.map(item => <Item key={item.productId} item={item} />);
 };
 
-const Item = ({ item }) => {
-  return <div>{item.name}</div>;
+const Item = ({ item: { name } }) => {
+  return <div>{name}</div>;
 };
 
 export const Order = ({ match }) => {

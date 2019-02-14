@@ -12,7 +12,7 @@ export const Dashboard = () => {
       <a href={uuid()}>New Order</a>
       <br />
       {orders.map(order => (
-        <a key={order.orderId} href={order.orderId} className="flex">
+        <a key={order.id} href={order.id} className="flex">
           <Moment date={order.date} format="MMMM Do YYYY h:mma" unix />
         </a>
       ))}

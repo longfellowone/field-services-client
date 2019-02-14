@@ -46,7 +46,7 @@ export const findOrders = (success, error, { pid }) => {
 
 export const findOrder = (success, error, { oid }) => {
   const request = new FindOrderRequest();
-  request.setOrderId(oid);
+  request.setId(oid);
 
   client.findOrder(request, {}, (err, response) => {
     err ? error(err) : success(response.toObject());
