@@ -1,23 +1,25 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { Dashboard } from './Dashboard';
-import { New } from './New';
+import { useErrorLoading, findOrder } from '../api/ordering';
+
+const ItemList = ({ items }) => {
+  return items.map(item => <Item key={item.productId} item={item} />);
+};
+
+const Item = ({ item }) => {
+  return <div>{item.name}</div>;
+};
 
 export const Order = ({ match }) => {
+  const id = match.params.id;
+  const [order, error, loading] = useErrorLoading(findOrder, { oid: id });
+  console.log(order, loading, error);
+
   return (
-    <Switch>
-      <Route
-        path={match.url + '/'}
-        exact
-        render={() => <Dashboard id={match.url} />}
-      />
-      <Route
-        path={match.url + '/new'}
-        exact
-        render={() => <New id={match.url} />}
-      />
-      {/* <Route path={match.url + '/new'} component={NewOrder} />
-      <Route path={match.url + '/receive'} component={ReceiveOrder} /> */}
-    </Switch>
+    <>
+      <div>Order {id}</div>
+      <br />
+      {error && <div>Order not found</div>}
+      {!error && !loading && <ItemList items={order.itemsList} />}
+    </>
   );
 };

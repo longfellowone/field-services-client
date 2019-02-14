@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { Dashboard } from './order/Dashboard';
 import { Order } from './order/Order';
 
 const Home = () => {
@@ -22,7 +23,8 @@ const App = () => (
     <div className="text-black container mx-auto">
       <Switch>
         <Route path="/" exact component={Home} />
-        <Route path="/order/" component={Order} />
+        <Route path="/order" exact component={Dashboard} />
+        <Route path="/order/:id" component={Order} />
       </Switch>
     </div>
   </Router>

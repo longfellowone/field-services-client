@@ -1,6 +1,7 @@
 import React from 'react';
 
-export const New = ({ id }) => {
+export const New = ({ match }) => {
+  const id = match.params.id;
   //const [orders, error, loading] = useErrorLoading(findOrders, { pid: 'pid1' });
   //console.log(orders, loading, error);
 

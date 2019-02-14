@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { OrderingClient } from './proto/ordering_grpc_web_pb';
-import { FindProjectOrderDatesRequest } from './proto/ordering_pb';
+import {
+  FindProjectOrderDatesRequest,
+  FindOrderRequest,
+} from './proto/ordering_pb';
 
 const client = new OrderingClient(
   'http://' + window.location.hostname + ':8080',
@@ -38,5 +41,14 @@ export const findOrders = (success, error, { pid }) => {
     err
       ? error(err)
       : success(response.toObject().ordersList.map(order => order));
+  });
+};
+
+export const findOrder = (success, error, { oid }) => {
+  const request = new FindOrderRequest();
+  request.setOrderId(oid);
+
+  client.findOrder(request, {}, (err, response) => {
+    err ? error(err) : success(response.toObject());
   });
 };
