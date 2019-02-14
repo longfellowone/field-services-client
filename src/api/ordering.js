@@ -3,6 +3,7 @@ import { OrderingClient } from './proto/ordering_grpc_web_pb';
 import {
   FindProjectOrderDatesRequest,
   FindOrderRequest,
+  CreateOrderRequest,
 } from './proto/ordering_pb';
 
 const client = new OrderingClient(
@@ -11,26 +12,23 @@ const client = new OrderingClient(
   null,
 );
 
-export const useErrorLoading = (func, opts) => {
+export const useGrpcRequest = (func, params) => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [status, setStatus] = useState({ error: false, loading: true });
 
   const success = data => {
     setData(data);
-    setLoading(false);
+    setStatus({ error: false, loading: false });
   };
   const err = err => {
-    console.log(err);
-    setError(true);
-    setLoading(false);
+    setStatus({ error: true, loading: false, code: err.code });
   };
 
   useEffect(() => {
-    func(success, err, opts);
+    func(success, err, params);
   }, []);
 
-  return [data, error, loading];
+  return [data, status.error, status.loading, status.code];
 };
 
 export const findOrders = (success, error, { pid }) => {
@@ -50,5 +48,15 @@ export const findOrder = (success, error, { oid }) => {
 
   client.findOrder(request, {}, (err, response) => {
     err ? error(err) : success(response.toObject());
+  });
+};
+
+export const createOrder = ({ oid, pid }) => {
+  const request = new CreateOrderRequest();
+  request.setId(oid);
+  request.setProjectId(pid);
+
+  client.createOrder(request, {}, err => {
+    return err;
   });
 };

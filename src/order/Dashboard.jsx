@@ -1,11 +1,10 @@
 import React from 'react';
 import Moment from 'react-moment';
 import { v4 as uuid } from 'uuid';
-import { useErrorLoading, findOrders } from '../api/ordering';
+import { useGrpcRequest, findOrders } from '../api/ordering';
 
 export const Dashboard = () => {
-  const [orders, error, loading] = useErrorLoading(findOrders, { pid: 'pid1' });
-  console.log(orders, loading, error);
+  const [orders] = useGrpcRequest(findOrders, { pid: 'pid1' });
 
   return (
     <>

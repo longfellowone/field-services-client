@@ -1,24 +1,27 @@
 import React from 'react';
-import { useErrorLoading, findOrder } from '../api/ordering';
+import { useGrpcRequest, findOrder, createOrder } from '../api/ordering';
 
 const ItemList = ({ items }) => {
   return items.map(item => <Item key={item.productId} item={item} />);
 };
 
-const Item = ({ item: { name } }) => {
-  return <div>{name}</div>;
+const Item = ({ item }) => {
+  return <div>{item.name}</div>;
 };
 
 export const Order = ({ match }) => {
   const id = match.params.id;
-  const [order, error, loading] = useErrorLoading(findOrder, { oid: id });
-  console.log(order, loading, error);
+  const [order, error, loading, code] = useGrpcRequest(findOrder, { oid: id });
+  if (code === 2) {
+    createOrder({ oid: id, pid: 'pid1' });
+  }
 
   return (
     <>
       <div>Order {id}</div>
       <br />
-      {error && <div>Order not found</div>}
+      {loading && <div>loading...</div>}
+      {code === 14 && <div>Cannot connect to server</div>}
       {!error && !loading && <ItemList items={order.itemsList} />}
     </>
   );
