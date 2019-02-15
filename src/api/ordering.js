@@ -12,23 +12,21 @@ const client = new OrderingClient(
   null,
 );
 
-export const useGrpcRequest = (func, params) => {
-  const [data, setData] = useState([]);
-  const [status, setStatus] = useState({ error: false, loading: true });
+export const useGrpcQuery = (func, params) => {
+  const [state, setState] = useState({ data: [], loading: true });
 
   const success = data => {
-    setData(data);
-    setStatus({ error: false, loading: false });
+    setState({ data: data, loading: false });
   };
-  const err = err => {
-    setStatus({ error: true, loading: false, code: err.code });
+  const error = error => {
+    setState({ error: error.code, loading: false });
   };
 
   useEffect(() => {
-    func(success, err, params);
+    func(success, error, params);
   }, []);
 
-  return [data, status.error, status.loading, status.code];
+  return [state.data, state.error, state.loading];
 };
 
 export const findOrders = (success, error, { pid }) => {
@@ -56,7 +54,5 @@ export const createOrder = ({ oid, pid }) => {
   request.setId(oid);
   request.setProjectId(pid);
 
-  client.createOrder(request, {}, err => {
-    return err;
-  });
+  client.createOrder(request, {}, err => {});
 };
