@@ -1,17 +1,19 @@
 import React from 'react';
 import Moment from 'react-moment';
 import { v4 } from 'uuid';
+import { Link } from 'react-router-dom';
 import { useGrpcQuery, findOrders } from '../api/ordering';
+// https://www.npmjs.com/package/classnames
 
 const OrdersList = ({ orders }) => {
   return orders.map(order => <OrderListItem key={order.id} order={order} />);
 };
 
-const OrderListItem = ({ order }) => {
+const OrderListItem = ({ order: { id, date } }) => {
   return (
-    <a key={order.id} href={order.id} className="flex">
-      <Moment date={order.date} format="MMMM Do YYYY h:mma" unix />
-    </a>
+    <Link to={id} key={id} className="flex">
+      <Moment date={date} format="MMMM Do YYYY h:mma" unix />{' '}
+    </Link>
   );
 };
 
