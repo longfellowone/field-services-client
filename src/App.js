@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
-import { Dashboard } from './order/Dashboard';
-import { Order } from './order/Order';
+import { Dashboard } from './Order/Dashboard';
+import { Order } from './Order/Order';
 
 const Home = () => {
   return (

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { OrderingClient } from './proto/ordering_grpc_web_pb';
+import { SupplyClient } from '../Order/proto/supply_grpc_web_pb';
 import {
   FindProjectOrderDatesRequest,
   FindOrderRequest,
   CreateOrderRequest,
-} from './proto/ordering_pb';
+} from '../Order/proto/supply_pb';
 
-const client = new OrderingClient(
+const client = new SupplyClient(
   'http://' + window.location.hostname + ':8080',
   null,
   null,

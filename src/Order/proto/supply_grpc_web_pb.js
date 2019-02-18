@@ -12,7 +12,7 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 const proto = {};
-proto.server = require('./ordering_pb.js');
+proto.server = require('./supply_pb.js');
 
 /**
  * @param {string} hostname
@@ -22,7 +22,7 @@ proto.server = require('./ordering_pb.js');
  * @struct
  * @final
  */
-proto.server.OrderingClient =
+proto.server.SupplyClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -58,15 +58,15 @@ proto.server.OrderingClient =
  * @struct
  * @final
  */
-proto.server.OrderingPromiseClient =
+proto.server.SupplyPromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
 
   /**
-   * @private @const {!proto.server.OrderingClient} The delegate callback based client
+   * @private @const {!proto.server.SupplyClient} The delegate callback based client
    */
-  this.delegateClient_ = new proto.server.OrderingClient(
+  this.delegateClient_ = new proto.server.SupplyClient(
       hostname, credentials, options);
 
 };
@@ -78,7 +78,7 @@ proto.server.OrderingPromiseClient =
  *   !proto.server.CreateOrderRequest,
  *   !proto.server.CreateOrderResponse>}
  */
-const methodInfo_Ordering_CreateOrder = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_CreateOrder = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.CreateOrderResponse,
   /** @param {!proto.server.CreateOrderRequest} request */
   function(request) {
@@ -98,13 +98,13 @@ const methodInfo_Ordering_CreateOrder = new grpc.web.AbstractClientBase.MethodIn
  * @return {!grpc.web.ClientReadableStream<!proto.server.CreateOrderResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.createOrder =
+proto.server.SupplyClient.prototype.createOrder =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/CreateOrder',
+      '/server.Supply/CreateOrder',
       request,
       metadata,
-      methodInfo_Ordering_CreateOrder,
+      methodInfo_Supply_CreateOrder,
       callback);
 };
 
@@ -117,7 +117,7 @@ proto.server.OrderingClient.prototype.createOrder =
  * @return {!Promise<!proto.server.CreateOrderResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.createOrder =
+proto.server.SupplyPromiseClient.prototype.createOrder =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.createOrder(
@@ -134,7 +134,7 @@ proto.server.OrderingPromiseClient.prototype.createOrder =
  *   !proto.server.SendOrderRequest,
  *   !proto.server.SendOrderResponse>}
  */
-const methodInfo_Ordering_SendOrder = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_SendOrder = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.SendOrderResponse,
   /** @param {!proto.server.SendOrderRequest} request */
   function(request) {
@@ -154,13 +154,13 @@ const methodInfo_Ordering_SendOrder = new grpc.web.AbstractClientBase.MethodInfo
  * @return {!grpc.web.ClientReadableStream<!proto.server.SendOrderResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.sendOrder =
+proto.server.SupplyClient.prototype.sendOrder =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/SendOrder',
+      '/server.Supply/SendOrder',
       request,
       metadata,
-      methodInfo_Ordering_SendOrder,
+      methodInfo_Supply_SendOrder,
       callback);
 };
 
@@ -173,7 +173,7 @@ proto.server.OrderingClient.prototype.sendOrder =
  * @return {!Promise<!proto.server.SendOrderResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.sendOrder =
+proto.server.SupplyPromiseClient.prototype.sendOrder =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.sendOrder(
@@ -190,7 +190,7 @@ proto.server.OrderingPromiseClient.prototype.sendOrder =
  *   !proto.server.AddOrderItemRequest,
  *   !proto.server.AddOrderItemResponse>}
  */
-const methodInfo_Ordering_AddOrderItem = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_AddOrderItem = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.AddOrderItemResponse,
   /** @param {!proto.server.AddOrderItemRequest} request */
   function(request) {
@@ -210,13 +210,13 @@ const methodInfo_Ordering_AddOrderItem = new grpc.web.AbstractClientBase.MethodI
  * @return {!grpc.web.ClientReadableStream<!proto.server.AddOrderItemResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.addOrderItem =
+proto.server.SupplyClient.prototype.addOrderItem =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/AddOrderItem',
+      '/server.Supply/AddOrderItem',
       request,
       metadata,
-      methodInfo_Ordering_AddOrderItem,
+      methodInfo_Supply_AddOrderItem,
       callback);
 };
 
@@ -229,7 +229,7 @@ proto.server.OrderingClient.prototype.addOrderItem =
  * @return {!Promise<!proto.server.AddOrderItemResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.addOrderItem =
+proto.server.SupplyPromiseClient.prototype.addOrderItem =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.addOrderItem(
@@ -246,7 +246,7 @@ proto.server.OrderingPromiseClient.prototype.addOrderItem =
  *   !proto.server.RemoveOrderItemRequest,
  *   !proto.server.RemoveOrderItemResponse>}
  */
-const methodInfo_Ordering_RemoveOrderItem = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_RemoveOrderItem = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.RemoveOrderItemResponse,
   /** @param {!proto.server.RemoveOrderItemRequest} request */
   function(request) {
@@ -266,13 +266,13 @@ const methodInfo_Ordering_RemoveOrderItem = new grpc.web.AbstractClientBase.Meth
  * @return {!grpc.web.ClientReadableStream<!proto.server.RemoveOrderItemResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.removeOrderItem =
+proto.server.SupplyClient.prototype.removeOrderItem =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/RemoveOrderItem',
+      '/server.Supply/RemoveOrderItem',
       request,
       metadata,
-      methodInfo_Ordering_RemoveOrderItem,
+      methodInfo_Supply_RemoveOrderItem,
       callback);
 };
 
@@ -285,7 +285,7 @@ proto.server.OrderingClient.prototype.removeOrderItem =
  * @return {!Promise<!proto.server.RemoveOrderItemResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.removeOrderItem =
+proto.server.SupplyPromiseClient.prototype.removeOrderItem =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.removeOrderItem(
@@ -302,7 +302,7 @@ proto.server.OrderingPromiseClient.prototype.removeOrderItem =
  *   !proto.server.ReceiveOrderItemRequest,
  *   !proto.server.ReceiveOrderItemResponse>}
  */
-const methodInfo_Ordering_ReceiveOrderItem = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_ReceiveOrderItem = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.ReceiveOrderItemResponse,
   /** @param {!proto.server.ReceiveOrderItemRequest} request */
   function(request) {
@@ -322,13 +322,13 @@ const methodInfo_Ordering_ReceiveOrderItem = new grpc.web.AbstractClientBase.Met
  * @return {!grpc.web.ClientReadableStream<!proto.server.ReceiveOrderItemResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.receiveOrderItem =
+proto.server.SupplyClient.prototype.receiveOrderItem =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/ReceiveOrderItem',
+      '/server.Supply/ReceiveOrderItem',
       request,
       metadata,
-      methodInfo_Ordering_ReceiveOrderItem,
+      methodInfo_Supply_ReceiveOrderItem,
       callback);
 };
 
@@ -341,7 +341,7 @@ proto.server.OrderingClient.prototype.receiveOrderItem =
  * @return {!Promise<!proto.server.ReceiveOrderItemResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.receiveOrderItem =
+proto.server.SupplyPromiseClient.prototype.receiveOrderItem =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.receiveOrderItem(
@@ -358,7 +358,7 @@ proto.server.OrderingPromiseClient.prototype.receiveOrderItem =
  *   !proto.server.ModifyRequestedQuantityRequest,
  *   !proto.server.ModifyRequestedQuantityResponse>}
  */
-const methodInfo_Ordering_ModifyRequestedQuantity = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_ModifyRequestedQuantity = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.ModifyRequestedQuantityResponse,
   /** @param {!proto.server.ModifyRequestedQuantityRequest} request */
   function(request) {
@@ -378,13 +378,13 @@ const methodInfo_Ordering_ModifyRequestedQuantity = new grpc.web.AbstractClientB
  * @return {!grpc.web.ClientReadableStream<!proto.server.ModifyRequestedQuantityResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.modifyRequestedQuantity =
+proto.server.SupplyClient.prototype.modifyRequestedQuantity =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/ModifyRequestedQuantity',
+      '/server.Supply/ModifyRequestedQuantity',
       request,
       metadata,
-      methodInfo_Ordering_ModifyRequestedQuantity,
+      methodInfo_Supply_ModifyRequestedQuantity,
       callback);
 };
 
@@ -397,7 +397,7 @@ proto.server.OrderingClient.prototype.modifyRequestedQuantity =
  * @return {!Promise<!proto.server.ModifyRequestedQuantityResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.modifyRequestedQuantity =
+proto.server.SupplyPromiseClient.prototype.modifyRequestedQuantity =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.modifyRequestedQuantity(
@@ -414,7 +414,7 @@ proto.server.OrderingPromiseClient.prototype.modifyRequestedQuantity =
  *   !proto.server.FindOrderRequest,
  *   !proto.server.FindOrderResponse>}
  */
-const methodInfo_Ordering_FindOrder = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_FindOrder = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.FindOrderResponse,
   /** @param {!proto.server.FindOrderRequest} request */
   function(request) {
@@ -434,13 +434,13 @@ const methodInfo_Ordering_FindOrder = new grpc.web.AbstractClientBase.MethodInfo
  * @return {!grpc.web.ClientReadableStream<!proto.server.FindOrderResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.findOrder =
+proto.server.SupplyClient.prototype.findOrder =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/FindOrder',
+      '/server.Supply/FindOrder',
       request,
       metadata,
-      methodInfo_Ordering_FindOrder,
+      methodInfo_Supply_FindOrder,
       callback);
 };
 
@@ -453,7 +453,7 @@ proto.server.OrderingClient.prototype.findOrder =
  * @return {!Promise<!proto.server.FindOrderResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.findOrder =
+proto.server.SupplyPromiseClient.prototype.findOrder =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.findOrder(
@@ -470,7 +470,7 @@ proto.server.OrderingPromiseClient.prototype.findOrder =
  *   !proto.server.FindProjectOrderDatesRequest,
  *   !proto.server.FindProjectOrderDatesResponse>}
  */
-const methodInfo_Ordering_FindProjectOrderDates = new grpc.web.AbstractClientBase.MethodInfo(
+const methodInfo_Supply_FindProjectOrderDates = new grpc.web.AbstractClientBase.MethodInfo(
   proto.server.FindProjectOrderDatesResponse,
   /** @param {!proto.server.FindProjectOrderDatesRequest} request */
   function(request) {
@@ -490,13 +490,13 @@ const methodInfo_Ordering_FindProjectOrderDates = new grpc.web.AbstractClientBas
  * @return {!grpc.web.ClientReadableStream<!proto.server.FindProjectOrderDatesResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingClient.prototype.findProjectOrderDates =
+proto.server.SupplyClient.prototype.findProjectOrderDates =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/server.Ordering/FindProjectOrderDates',
+      '/server.Supply/FindProjectOrderDates',
       request,
       metadata,
-      methodInfo_Ordering_FindProjectOrderDates,
+      methodInfo_Supply_FindProjectOrderDates,
       callback);
 };
 
@@ -509,7 +509,7 @@ proto.server.OrderingClient.prototype.findProjectOrderDates =
  * @return {!Promise<!proto.server.FindProjectOrderDatesResponse>}
  *     The XHR Node Readable Stream
  */
-proto.server.OrderingPromiseClient.prototype.findProjectOrderDates =
+proto.server.SupplyPromiseClient.prototype.findProjectOrderDates =
     function(request, metadata) {
   return new Promise((resolve, reject) => {
     this.delegateClient_.findProjectOrderDates(
@@ -517,6 +517,120 @@ proto.server.OrderingPromiseClient.prototype.findProjectOrderDates =
         error ? reject(error) : resolve(response);
       });
   });
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.server.ProductSearchRequest,
+ *   !proto.server.ProductSearchResponse>}
+ */
+const methodInfo_Supply_ProductSearch = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.server.ProductSearchResponse,
+  /** @param {!proto.server.ProductSearchRequest} request */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.server.ProductSearchResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.server.ProductSearchRequest} request The
+ *     request proto
+ * @param {!Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.server.ProductSearchResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.server.ProductSearchResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.server.SupplyClient.prototype.productSearch =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/server.Supply/ProductSearch',
+      request,
+      metadata,
+      methodInfo_Supply_ProductSearch,
+      callback);
+};
+
+
+/**
+ * @param {!proto.server.ProductSearchRequest} request The
+ *     request proto
+ * @param {!Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.server.ProductSearchResponse>}
+ *     The XHR Node Readable Stream
+ */
+proto.server.SupplyPromiseClient.prototype.productSearch =
+    function(request, metadata) {
+  return new Promise((resolve, reject) => {
+    this.delegateClient_.productSearch(
+      request, metadata, (error, response) => {
+        error ? reject(error) : resolve(response);
+      });
+  });
+};
+
+
+/**
+ * @param {string} hostname
+ * @param {?Object} credentials
+ * @param {?Object} options
+ * @constructor
+ * @struct
+ * @final
+ */
+proto.server.PurchasingClient =
+    function(hostname, credentials, options) {
+  if (!options) options = {};
+  options['format'] = 'text';
+
+  /**
+   * @private @const {!grpc.web.GrpcWebClientBase} The client
+   */
+  this.client_ = new grpc.web.GrpcWebClientBase(options);
+
+  /**
+   * @private @const {string} The hostname
+   */
+  this.hostname_ = hostname;
+
+  /**
+   * @private @const {?Object} The credentials to be used to connect
+   *    to the server
+   */
+  this.credentials_ = credentials;
+
+  /**
+   * @private @const {?Object} Options for the client
+   */
+  this.options_ = options;
+};
+
+
+/**
+ * @param {string} hostname
+ * @param {?Object} credentials
+ * @param {?Object} options
+ * @constructor
+ * @struct
+ * @final
+ */
+proto.server.PurchasingPromiseClient =
+    function(hostname, credentials, options) {
+  if (!options) options = {};
+  options['format'] = 'text';
+
+  /**
+   * @private @const {!proto.server.PurchasingClient} The delegate callback based client
+   */
+  this.delegateClient_ = new proto.server.PurchasingClient(
+      hostname, credentials, options);
+
 };
 
 
