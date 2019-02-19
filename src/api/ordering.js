@@ -3,8 +3,63 @@ import { SupplyClient } from '../Order/proto/supply_grpc_web_pb';
 import {
   FindProjectOrderDatesRequest,
   FindOrderRequest,
-  CreateOrderRequest,
+  ProductSearchRequest,
 } from '../Order/proto/supply_pb';
+
+export const useGrpcRequest = (func, setState) => {
+  const [params, setParams] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        if (!params) return;
+        const result = await func(params);
+        if (!mounted) return;
+        setState(result);
+      } catch (error) {}
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [params]);
+
+  return params => setParams(params);
+};
+
+export const findOrders = ({ pid }) =>
+  new Promise((resolve, reject) => {
+    const request = new FindProjectOrderDatesRequest();
+    request.setProjectId(pid);
+
+    client.findProjectOrderDates(request, {}, (err, response) => {
+      err
+        ? reject(err)
+        : resolve(response.toObject().ordersList.map(order => order));
+    });
+  });
+
+export const findOrder = ({ oid }) =>
+  new Promise((resolve, reject) => {
+    const request = new FindOrderRequest();
+    request.setId(oid);
+
+    client.findOrder(request, {}, (err, response) => {
+      err ? reject(err) : resolve(response.toObject());
+    });
+  });
+
+export const productSearch = ({ name }) =>
+  new Promise((resolve, reject) => {
+    const request = new ProductSearchRequest();
+    request.setName(name);
+
+    client.productSearch(request, {}, (err, response) => {
+      err
+        ? reject(err)
+        : resolve(response.toObject().resultsList.map(product => product));
+    });
+  });
 
 const client = new SupplyClient(
   'http://' + window.location.hostname + ':8080',
@@ -12,47 +67,44 @@ const client = new SupplyClient(
   null,
 );
 
-export const useGrpcQuery = (func, params) => {
-  const [state, setState] = useState({ data: [], loading: true });
+// export const useGrpcQuery = (func, params) => {
+//   const [state, setState] = useState({ data: [], loading: true });
 
-  const success = data => {
-    setState({ data: data, loading: false });
-  };
-  const error = error => {
-    setState({ error: error.code, loading: false });
-  };
+//   const success = data => {
+//     setState({ data: data, loading: false });
+//   };
+//   const error = error => {
+//     setState({ error: error.code, loading: false });
+//   };
 
-  useEffect(() => {
-    func(success, error, params);
-  }, []);
+//   useEffect(() => {
+//     func(success, error, params);
+//   }, []);
 
-  return [state.data, state.error, state.loading];
-};
+//   return [state.data, state.error, state.loading];
+// };
 
-export const findOrders = (success, error, { pid }) => {
-  const request = new FindProjectOrderDatesRequest();
-  request.setProjectId(pid);
+// export const createOrder = ({ oid, pid }) => {
+//   const request = new CreateOrderRequest();
+//   request.setId(oid);
+//   request.setProjectId(pid);
 
-  client.findProjectOrderDates(request, {}, (err, response) => {
-    err
-      ? error(err)
-      : success(response.toObject().ordersList.map(order => order));
-  });
-};
+//   client.createOrder(request, {}, err => {});
+// };
 
-export const findOrder = (success, error, { oid }) => {
-  const request = new FindOrderRequest();
-  request.setId(oid);
+// const find = callback => {
+//   const request = new FindProjectOrderDatesRequest();
+//   request.setProjectId('pid1');
 
-  client.findOrder(request, {}, (err, response) => {
-    err ? error(err) : success(response.toObject());
-  });
-};
+//   const response = (err, res) => {
+//     err
+//       ? callback({ error: err, loading: false })
+//       : callback({
+//           data: res.toObject().ordersList.map(order => order),
+//           loading: false,
+//         });
+//   };
 
-export const createOrder = ({ oid, pid }) => {
-  const request = new CreateOrderRequest();
-  request.setId(oid);
-  request.setProjectId(pid);
-
-  client.createOrder(request, {}, err => {});
-};
+//   const status = client.findProjectOrderDates(request, {}, response);
+//   return () => status.cancel();
+// };

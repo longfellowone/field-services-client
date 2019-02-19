@@ -1,28 +1,61 @@
-import React from 'react';
-import { useGrpcQuery, findOrder, createOrder } from '../api/ordering';
+import React, { useState, useEffect } from 'react';
+import { useGrpcRequest, findOrder } from '../api/ordering';
+import { Search } from './Search';
+
+export const Order = ({ match }) => {
+  const [order, setOrder] = useState({});
+  const findOrderRequest = useGrpcRequest(findOrder, setOrder);
+  const id = match.params.id;
+
+  useEffect(() => {
+    findOrderRequest({ oid: id });
+  }, []);
+
+  //const [order, error, loading] = useGrpcQuery(findOrder, { oid: id });
+  // if (error === 2) {
+  //   createOrder({ oid: id, pid: 'pid1' });
+  // }
+
+  return (
+    <>
+      {/* {loading && <div>loading...</div>}
+      {error === 14 && <div>Cannot connect to server</div>}
+      {!error && !loading && <ItemList items={order.itemsList} />} */}
+      <div className="max-w-sm mx-auto px-2 sm:text-md mt-2">
+        <ul className="list-reset">
+          {order.itemsList && <ItemList items={order.itemsList} />}
+        </ul>
+        {/* <div className="mb-1 mt-4 px-3">
+          Can't find what you're looking for? <u>Click Here</u>
+        </div> */}
+        <Search />
+      </div>
+    </>
+  );
+};
 
 const ItemList = ({ items }) => {
   return items.map(item => <Item key={item.productId} item={item} />);
 };
 
-const Item = ({ item: { name } }) => {
-  return <div>{name}</div>;
-};
-
-export const Order = ({ match }) => {
-  const id = match.params.id;
-  const [order, error, loading] = useGrpcQuery(findOrder, { oid: id });
-  if (error === 2) {
-    createOrder({ oid: id, pid: 'pid1' });
+const Item = ({ item: { productId, name, uom, quantityRequested } }) => {
+  if (quantityRequested === 0) {
+    quantityRequested = '';
   }
+  const [input, setInput] = useState(quantityRequested);
 
   return (
-    <>
-      <div>Order {id}</div>
-      <br />
-      {loading && <div>loading...</div>}
-      {error === 14 && <div>Cannot connect to server</div>}
-      {!error && !loading && <ItemList items={order.itemsList} />}
-    </>
+    <li className="flex justify-between items-center rounded-lg border border-grey p-3 mb-1h shadow-md">
+      <div className="flex-1">{name}</div>
+      <div>
+        <input
+          className="bg-transparent appearance-none rounded-none border-none text-right text-black w-32 sm:w-48 mr-1"
+          placeholder="Enter quantity... "
+          onChange={e => setInput(e.target.value)}
+          value={input}
+        />
+        {uom}
+      </div>
+    </li>
   );
 };
