@@ -9,6 +9,9 @@
   .content-box {
     box-sizing: content-box;
   }
+  .tap-none {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @tailwind utilities;

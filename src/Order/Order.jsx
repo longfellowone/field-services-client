@@ -44,17 +44,24 @@ const Item = ({ item: { productId, name, uom, quantityRequested } }) => {
   }
   const [input, setInput] = useState(quantityRequested);
 
+  const handleOnChange = e => {
+    e.preventDefault();
+    setInput(e.target.value);
+  };
+
   return (
     <li className="flex justify-between items-center rounded-lg border border-grey p-3 mb-1h shadow-md">
       <div className="flex-1">{name}</div>
-      <div>
+      <div className="flex">
         <input
-          className="bg-transparent appearance-none rounded-none border-none text-right text-black w-32 sm:w-48 mr-1"
-          placeholder="Enter quantity... "
-          onChange={e => setInput(e.target.value)}
+          onChange={handleOnChange}
           value={input}
+          className="bg-transparent appearance-none rounded-none border-none text-right text-black w-32 py-0 -mr-1 sm:w-48 sm:mr-1"
+          placeholder="Enter quantity... "
+          pattern="[0-9]*"
+          type="tel"
         />
-        {uom}
+        <div className="font-bold">{uom}</div>
       </div>
     </li>
   );

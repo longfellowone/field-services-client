@@ -532,6 +532,10 @@ table {
   box-sizing: content-box;
 }
 
+.tap-none {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .list-reset {
   list-style: none;
   padding: 0;
@@ -6167,6 +6171,10 @@ table {
     box-sizing: content-box;
   }
 
+  .sm\:tap-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   .sm\:list-reset {
     list-style: none;
     padding: 0;
@@ -11777,6 +11785,10 @@ table {
 
   .md\:content-box {
     box-sizing: content-box;
+  }
+
+  .md\:tap-none {
+    -webkit-tap-highlight-color: transparent;
   }
 
   .md\:list-reset {
@@ -17391,6 +17403,10 @@ table {
     box-sizing: content-box;
   }
 
+  .lg\:tap-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   .lg\:list-reset {
     list-style: none;
     padding: 0;
@@ -23001,6 +23017,10 @@ table {
 
   .xl\:content-box {
     box-sizing: content-box;
+  }
+
+  .xl\:tap-none {
+    -webkit-tap-highlight-color: transparent;
   }
 
   .xl\:list-reset {
