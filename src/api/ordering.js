@@ -10,10 +10,10 @@ export const useGrpcRequest = (func, setState) => {
   const [params, setParams] = useState(null);
 
   useEffect(() => {
+    if (!params) return;
     let mounted = true;
     (async () => {
       try {
-        if (!params) return;
         const result = await func(params);
         if (!mounted) return;
         setState(result);
