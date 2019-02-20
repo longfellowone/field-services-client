@@ -5,7 +5,7 @@ export const Search = () => {
   const [input, setInput] = useState([]);
   const [results, setResults] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const [menuHighlighted, setmenuHighlighted] = useState(false);
+  const [menuHighlighted, setMenuHighlighted] = useState(false);
   const myRef = createRef();
   const productSearchRequest = useGrpcRequest(productSearch, setResults);
 
@@ -42,6 +42,11 @@ export const Search = () => {
     productSearchRequest({ name: e.target.value });
   };
 
+  const handleOnMouseLeave = e => {
+    e.preventDefault();
+    setMenuHighlighted(false);
+  };
+
   let inputClass = 'rounded-t-lg border-b border-grey py-1';
   if (results.length === 0) inputClass += ' rounded-b-lg';
 
@@ -53,7 +58,7 @@ export const Search = () => {
     highlightedIndex,
     setHighlightedIndex,
     handleOnKeyDown,
-    setmenuHighlighted,
+    setMenuHighlighted,
     scrollToMyRef,
   };
 
@@ -69,14 +74,17 @@ export const Search = () => {
               onChange={handleOnChange}
               onKeyDown={handleOnKeyDown}
               ref={focusInput}
-              className="w-full bg-transparent appearance-none text-black pl-3 py-2 border-none m-0 outline-none z-10 tap-none sm:text-md"
+              className="w-full bg-transparent appearance-none text-black py-2 px-3 border-none m-0 outline-none z-10 tap-none sm:text-md"
               placeholder="Search for an item..."
               tabIndex="0"
               type="search"
             />
           </form>
         </div>
-        <ul className="list-reset rounded-b-lg">
+        <ul
+          className="list-reset rounded-b-lg"
+          onMouseLeave={handleOnMouseLeave}
+        >
           <ResultList {...props} />
         </ul>
       </div>
@@ -103,7 +111,7 @@ const Result = ({
   index,
   highlightedIndex,
   setHighlightedIndex,
-  setmenuHighlighted,
+  setMenuHighlighted,
   scrollToMyRef,
 }) => {
   const markedName = replaceAt(indexesList.map(index => index.index), name);
@@ -111,12 +119,7 @@ const Result = ({
   const handleOnMouseEnter = e => {
     e.preventDefault();
     setHighlightedIndex(index);
-    setmenuHighlighted(true);
-  };
-
-  const handleOnMouseLeave = e => {
-    e.preventDefault();
-    setmenuHighlighted(false);
+    setMenuHighlighted(true);
   };
 
   let liClass = 'flex font-bold justify-between border-b border-grey p-3 z-10';
@@ -128,7 +131,6 @@ const Result = ({
       className={liClass}
       style={highlightedIndex === index ? { background: '#f1f5f8' } : {}}
       onMouseEnter={handleOnMouseEnter}
-      onMouseLeave={handleOnMouseLeave}
     >
       <div dangerouslySetInnerHTML={{ __html: markedName }} />
       <div>{uom}</div>

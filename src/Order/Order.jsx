@@ -56,7 +56,7 @@ const Item = ({ item: { productId, name, uom, quantityRequested } }) => {
         <input
           onChange={handleOnChange}
           value={input}
-          className="bg-transparent appearance-none rounded-none border-none text-right text-black w-32 py-0 -mr-1 sm:w-48 sm:mr-1"
+          className="bg-transparent appearance-none rounded-none border-none outline-none text-right text-black w-32 p-0 mr-1 sm:w-48"
           placeholder="Enter quantity... "
           pattern="[0-9]*"
           type="tel"
