@@ -136,32 +136,11 @@ const Result = ({
   );
 };
 
-function replaceAt(indexArray, string) {
-  const stringArray = [...string];
-  let newString = [];
-
-  const insertTag = (letter, letterIndex) => {
-    let match = false;
-    indexArray.forEach(index => {
-      if (parseInt(index) === letterIndex) return (match = true);
-    });
-    match
-      ? newString.push('<span class="font-normal">', letter, '</span>')
-      : newString.push(letter);
-  };
-
-  stringArray.forEach(insertTag);
-  return newString.join('');
+function replaceAt(indexArray, inputString) {
+  const string = [...inputString];
+  const startTag = '<span class="font-normal">';
+  const endTag = '</span>';
+  const tagAtIndex = i => string.splice(i, 1, startTag + string[i] + endTag);
+  indexArray.forEach(tagAtIndex);
+  return string.join('');
 }
-
-// function replaceAt(indexArray, string) {
-//   const newString = [...string];
-//   const replaceValue = i =>
-//     (newString[i] = (
-//       <span className="font-normal" key={i}>
-//         {newString[i]}
-//       </span>
-//     ));
-//   indexArray.map(replaceValue);
-//   return newString;
-// }
