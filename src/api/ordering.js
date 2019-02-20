@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { SupplyClient } from '../Order/proto/supply_grpc_web_pb';
+import { SupplyClient } from './proto/supply_grpc_web_pb';
 import {
   FindProjectOrderDatesRequest,
   FindOrderRequest,
   ProductSearchRequest,
-} from '../Order/proto/supply_pb';
+} from './proto/supply_pb';
 
 export const useGrpcRequest = (func, setState) => {
   const [params, setParams] = useState(null);

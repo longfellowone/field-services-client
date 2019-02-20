@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useGrpcRequest, findOrder } from '../api/ordering';
 import { Search } from './Search';
+import { useSpring, animated } from 'react-spring';
 
 export const Order = ({ match }) => {
   const [order, setOrder] = useState({});
   const findOrderRequest = useGrpcRequest(findOrder, setOrder);
+  const onLoad = useSpring({
+    color: 'white',
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+    delay: '80',
+  });
+
   const id = match.params.id;
 
   useEffect(() => {
@@ -18,18 +26,23 @@ export const Order = ({ match }) => {
 
   return (
     <>
-      {/* {loading && <div>loading...</div>}
+      {order && (
+        <animated.div style={onLoad}>
+          {/* {loading && <div>loading...</div>}
       {error === 14 && <div>Cannot connect to server</div>}
       {!error && !loading && <ItemList items={order.itemsList} />} */}
-      <div className="max-w-sm mx-auto px-2 sm:text-md mt-2">
-        <ul className="list-reset">
-          {order.itemsList && <ItemList items={order.itemsList} />}
-        </ul>
-        {/* <div className="mb-1 mt-4 px-3">
+
+          <div className="max-w-sm mx-auto px-2 sm:text-md mt-2">
+            <ul className="list-reset">
+              {order.itemsList && <ItemList items={order.itemsList} />}
+            </ul>
+            {/* <div className="mb-1 mt-4 px-3">
           Can't find what you're looking for? <u>Click Here</u>
-        </div> */}
-        <Search />
-      </div>
+        </div> */}{' '}
+            <Search />
+          </div>
+        </animated.div>
+      )}
     </>
   );
 };

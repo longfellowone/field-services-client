@@ -47,9 +47,6 @@ export const Search = () => {
     setMenuHighlighted(false);
   };
 
-  let inputClass = 'rounded-t-lg border-b border-grey py-1';
-  if (results.length === 0) inputClass += ' rounded-b-lg';
-
   const focusInput = input => input && input.focus();
   const scrollToMyRef = () => window.scrollTo(0, 55, myRef.current.offsetTop);
 
@@ -65,8 +62,8 @@ export const Search = () => {
   return (
     <>
       <div ref={myRef} />
-      <div className="shadow-md rounded-lg border border-grey">
-        <div className={inputClass}>
+      <div className="shadow-md rounded-lg border border-grey rounded-t-lg">
+        <div className="py-1">
           <form action=".">
             <input
               value={input}
@@ -74,7 +71,7 @@ export const Search = () => {
               onChange={handleOnChange}
               onKeyDown={handleOnKeyDown}
               ref={focusInput}
-              className="w-full bg-transparent appearance-none text-black py-2 px-3 border-none m-0 outline-none z-10 tap-none sm:text-md"
+              className="w-full bg-transparent appearance-none text-black pl-3 py-2 border-none m-0 outline-none tap-none sm:text-md"
               placeholder="Search for an item..."
               tabIndex="0"
               type="search"
@@ -122,7 +119,7 @@ const Result = ({
     setMenuHighlighted(true);
   };
 
-  let liClass = 'flex font-bold justify-between border-b border-grey p-3 z-10';
+  let liClass = 'flex font-bold justify-between border-t border-grey p-3';
   if (results.length === 1) liClass += ' rounded-b-lg';
 
   return (
