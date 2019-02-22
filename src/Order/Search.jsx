@@ -57,7 +57,6 @@ export const Search = () => {
 
   return (
     <>
-      <div />
       <div className="shadow-md rounded-lg border border-grey rounded-t-lg">
         <div className="py-1">
           <form action=".">

@@ -8,15 +8,24 @@ import {
 
 export function useGrpcRequestv2(func, dispatch, errorFunc, successFunc) {
   const [params, setParams] = useState('');
-
+  const [debouncedValue, setDebouncedValue] = useState(params);
   const responseCallback = (error, response) =>
-    error ? dispatch(errorFunc(response)) : dispatch(successFunc(response));
+    error ? dispatch(errorFunc(error)) : dispatch(successFunc(response));
 
+  // if (!delay) delay = 0;
+  let delay = 50;
   useEffect(() => {
     if (!params) return;
+    const handler = setTimeout(() => {
+      setDebouncedValue(params);
+    }, delay);
+    return () => clearTimeout(handler);
+  }, [params]);
+
+  useEffect(() => {
     const cancel = func(params, responseCallback);
     return () => cancel();
-  }, [params]);
+  }, [debouncedValue]);
 
   return params => setParams(params);
 }
@@ -30,7 +39,6 @@ export const productSearch = ({ name }, responseCallback) => {
 };
 
 // OLD
-
 export const useGrpcRequest = (func, setState) => {
   const [params, setParams] = useState(null);
 

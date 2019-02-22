@@ -8,7 +8,8 @@ export function searchReducer(state, action) {
         data: action.payload.toObject().resultsList.map(product => product),
       };
     case SEARCH_ERROR:
-      return { ...state, data: [] };
+      if (action.payload.message === 'Request was aborted') return state;
+      return { ...state, data: [], error: true };
     case SEARCH_RESET:
       return { ...state, data: [] };
     default:
