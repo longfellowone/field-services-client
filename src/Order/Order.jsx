@@ -12,7 +12,6 @@ export const Order = ({ match }) => {
     to: { opacity: 1 },
     delay: '80',
   });
-
   const id = match.params.id;
 
   useEffect(() => {
@@ -26,7 +25,7 @@ export const Order = ({ match }) => {
 
   return (
     <>
-      {order && (
+      {order.itemsList && (
         <animated.div style={onLoad}>
           {/* {loading && <div>loading...</div>}
       {error === 14 && <div>Cannot connect to server</div>}

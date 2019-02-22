@@ -21,6 +21,16 @@ export function useGrpcRequestv2(func, dispatch, errorFunc, successFunc) {
   return params => setParams(params);
 }
 
+export const productSearch = ({ name }, responseCallback) => {
+  const request = new ProductSearchRequest();
+  request.setName(name);
+
+  const status = client.productSearch(request, {}, responseCallback);
+  return () => status.cancel();
+};
+
+// OLD
+
 export const useGrpcRequest = (func, setState) => {
   const [params, setParams] = useState(null);
 
@@ -63,26 +73,6 @@ export const findOrder = ({ oid }) =>
       err ? reject(err) : resolve(response.toObject());
     });
   });
-
-export const productSearch = ({ name }) =>
-  new Promise((resolve, reject) => {
-    const request = new ProductSearchRequest();
-    request.setName(name);
-
-    client.productSearch(request, {}, (err, response) => {
-      err
-        ? reject(err)
-        : resolve(response.toObject().resultsList.map(product => product));
-    });
-  });
-
-export const productSearchv2 = ({ name }, responseCallback) => {
-  const request = new ProductSearchRequest();
-  request.setName(name);
-
-  const status = client.productSearch(request, {}, responseCallback);
-  return () => status.cancel();
-};
 
 const client = new SupplyClient(
   'http://' + window.location.hostname + ':8080',

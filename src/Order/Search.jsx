@@ -1,12 +1,12 @@
 import React, { useState, useReducer } from 'react';
-import { useGrpcRequestv2, productSearchv2 } from '../api/ordering';
+import { useGrpcRequestv2, productSearch } from '../api/ordering';
 import { searchReducer } from './reducer';
-import { searchResponse, searchError, searchReset } from './actions';
+import { searchResponse, searchError, SEARCH_RESET } from './actions';
 
 export const Search = () => {
   const [results, dispatch] = useReducer(searchReducer, { data: [] });
   const makeSearchRequest = useGrpcRequestv2(
-    productSearchv2,
+    productSearch,
     dispatch,
     searchError,
     searchResponse,
@@ -14,13 +14,12 @@ export const Search = () => {
   const [input, setInput] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
-  // const productSearchRequest = useGrpcRequest(productSearch, setResults);
 
   const handleOnKeyDown = e => {
     if (results.data.length === 0) return;
     if (e.key === 'Escape') {
       e.preventDefault();
-      dispatch(searchReset());
+      dispatch({ type: SEARCH_RESET });
       setHighlightedIndex(0);
     }
     if (e.key === 'Tab') {
@@ -45,7 +44,7 @@ export const Search = () => {
     if (!menuHighlighted) {
       setHighlightedIndex(0);
     }
-    if (e.target.value === '') return dispatch(searchReset());
+    if (e.target.value === '') return dispatch({ type: SEARCH_RESET });
     makeSearchRequest({ name: e.target.value });
   };
 
@@ -55,14 +54,6 @@ export const Search = () => {
   };
 
   const focusInput = input => input && input.focus();
-
-  const props = {
-    results,
-    highlightedIndex,
-    setHighlightedIndex,
-    handleOnKeyDown,
-    setMenuHighlighted,
-  };
 
   return (
     <>
@@ -86,30 +77,43 @@ export const Search = () => {
           className="list-reset rounded-b-lg"
           onMouseLeave={handleOnMouseLeave}
         >
-          <ResultList {...props} />
+          <ResultList
+            results={results}
+            highlightedIndex={highlightedIndex}
+            setHighlightedIndex={setHighlightedIndex}
+            setMenuHighlighted={setMenuHighlighted}
+          />
         </ul>
       </div>
     </>
   );
 };
 
-const ResultList = ({ results, ...props }) => {
-  if (!results.data) return null;
-  return results.data.map((result, index) => (
-    <Result
-      key={result.productUuid}
-      results={results}
-      result={result}
-      index={index}
-      {...props}
-    />
-  ));
-};
+const ResultList = React.memo(
+  ({ results, highlightedIndex, setHighlightedIndex, setMenuHighlighted }) => {
+    const lastResult = results.data.length === 0 ? true : false;
+    if (results.data.length === 0) return null;
+
+    console.log('ResultList RENDER');
+
+    return results.data.map((result, index) => (
+      <Result
+        key={result.productUuid}
+        result={result}
+        index={index}
+        lastResult={lastResult}
+        highlightedIndex={highlightedIndex}
+        setHighlightedIndex={setHighlightedIndex}
+        setMenuHighlighted={setMenuHighlighted}
+      />
+    ));
+  },
+);
 
 const Result = ({
-  results,
   result: { name, uom, indexesList },
   index,
+  lastResult,
   highlightedIndex,
   setHighlightedIndex,
   setMenuHighlighted,
@@ -123,7 +127,7 @@ const Result = ({
   };
 
   let liClass = 'flex font-bold justify-between border-t border-grey p-3';
-  if (results.data.length === 1) liClass += ' rounded-b-lg';
+  if (lastResult) liClass += ' rounded-b-lg';
 
   return (
     <li
