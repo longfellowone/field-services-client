@@ -12,7 +12,6 @@ export const Dashboard = () => {
   const uuid = v4();
 
   useEffect(() => {
-    console.log('hit');
     findOrdersRequest({ pid: 'pid1' });
   }, []);
 

@@ -1,19 +1,26 @@
-import React, { useState, createRef } from 'react';
-import { useGrpcRequest, productSearch } from '../api/ordering';
+import React, { useState, useReducer } from 'react';
+import { useGrpcRequestv2, productSearchv2 } from '../api/ordering';
+import { searchReducer } from './reducer';
+import { searchResponse, searchError, searchReset } from './actions';
 
 export const Search = () => {
+  const [results, dispatch] = useReducer(searchReducer, { data: [] });
+  const makeSearchRequest = useGrpcRequestv2(
+    productSearchv2,
+    dispatch,
+    searchError,
+    searchResponse,
+  );
   const [input, setInput] = useState([]);
-  const [results, setResults] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
-  const myRef = createRef();
-  const productSearchRequest = useGrpcRequest(productSearch, setResults);
+  // const productSearchRequest = useGrpcRequest(productSearch, setResults);
 
   const handleOnKeyDown = e => {
-    if (results.length === 0) return;
+    if (results.data.length === 0) return;
     if (e.key === 'Escape') {
       e.preventDefault();
-      setResults([]);
+      dispatch(searchReset());
       setHighlightedIndex(0);
     }
     if (e.key === 'Tab') {
@@ -22,7 +29,7 @@ export const Search = () => {
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      if (highlightedIndex === results.length - 1) return;
+      if (highlightedIndex === results.data.length - 1) return;
       setHighlightedIndex(highlightedIndex => highlightedIndex + 1);
     }
     if (e.key === 'ArrowUp') {
@@ -38,8 +45,8 @@ export const Search = () => {
     if (!menuHighlighted) {
       setHighlightedIndex(0);
     }
-    if (e.target.value === '') return setResults([]);
-    productSearchRequest({ name: e.target.value });
+    if (e.target.value === '') return dispatch(searchReset());
+    makeSearchRequest({ name: e.target.value });
   };
 
   const handleOnMouseLeave = e => {
@@ -48,7 +55,6 @@ export const Search = () => {
   };
 
   const focusInput = input => input && input.focus();
-  const scrollToMyRef = () => window.scrollTo(0, 55, myRef.current.offsetTop);
 
   const props = {
     results,
@@ -56,18 +62,16 @@ export const Search = () => {
     setHighlightedIndex,
     handleOnKeyDown,
     setMenuHighlighted,
-    scrollToMyRef,
   };
 
   return (
     <>
-      <div ref={myRef} />
+      <div />
       <div className="shadow-md rounded-lg border border-grey rounded-t-lg">
         <div className="py-1">
           <form action=".">
             <input
               value={input}
-              onClick={scrollToMyRef}
               onChange={handleOnChange}
               onKeyDown={handleOnKeyDown}
               ref={focusInput}
@@ -90,8 +94,8 @@ export const Search = () => {
 };
 
 const ResultList = ({ results, ...props }) => {
-  if (!results) return null;
-  return results.map((result, index) => (
+  if (!results.data) return null;
+  return results.data.map((result, index) => (
     <Result
       key={result.productUuid}
       results={results}
@@ -109,7 +113,6 @@ const Result = ({
   highlightedIndex,
   setHighlightedIndex,
   setMenuHighlighted,
-  scrollToMyRef,
 }) => {
   const markedName = replaceAt(indexesList.map(index => index.index), name);
 
@@ -120,11 +123,10 @@ const Result = ({
   };
 
   let liClass = 'flex font-bold justify-between border-t border-grey p-3';
-  if (results.length === 1) liClass += ' rounded-b-lg';
+  if (results.data.length === 1) liClass += ' rounded-b-lg';
 
   return (
     <li
-      onClick={scrollToMyRef}
       className={liClass}
       style={highlightedIndex === index ? { background: '#f1f5f8' } : {}}
       onMouseEnter={handleOnMouseEnter}

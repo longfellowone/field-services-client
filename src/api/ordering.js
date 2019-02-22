@@ -6,6 +6,21 @@ import {
   ProductSearchRequest,
 } from './proto/supply_pb';
 
+export function useGrpcRequestv2(func, dispatch, errorFunc, successFunc) {
+  const [params, setParams] = useState('');
+
+  const responseCallback = (error, response) =>
+    error ? dispatch(errorFunc(response)) : dispatch(successFunc(response));
+
+  useEffect(() => {
+    if (!params) return;
+    const cancel = func(params, responseCallback);
+    return () => cancel();
+  }, [params]);
+
+  return params => setParams(params);
+}
+
 export const useGrpcRequest = (func, setState) => {
   const [params, setParams] = useState(null);
 
@@ -60,6 +75,14 @@ export const productSearch = ({ name }) =>
         : resolve(response.toObject().resultsList.map(product => product));
     });
   });
+
+export const productSearchv2 = ({ name }, responseCallback) => {
+  const request = new ProductSearchRequest();
+  request.setName(name);
+
+  const status = client.productSearch(request, {}, responseCallback);
+  return () => status.cancel();
+};
 
 const client = new SupplyClient(
   'http://' + window.location.hostname + ':8080',
