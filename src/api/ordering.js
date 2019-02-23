@@ -34,7 +34,14 @@ export const productSearch = ({ name }, responseCallback) => {
   const request = new ProductSearchRequest();
   request.setName(name);
 
-  const status = client.productSearch(request, {}, responseCallback);
+  const deadline = new Date();
+  deadline.setSeconds(deadline.getSeconds() + 1);
+
+  const status = client.productSearch(
+    request,
+    { deadline: deadline.getTime() },
+    responseCallback,
+  );
   return () => status.cancel();
 };
 

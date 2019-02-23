@@ -1,21 +1,14 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 export const Test = () => {
   const [input, setInput] = useState('hello');
-  const [state, dispatch] = useReducer(reducer, { data: null });
-  const makeRequest = useGrpcRequest(
-    request,
-    dispatch,
-    requestSuccess,
-    requestError,
-  );
-
+  const [state, dispatch] = useAsyncReducer(reducer, { data: null });
   useEffect(() => console.clear(), []);
 
   const handleOnClick = () => {
-    dispatch(requestStart(input));
-    makeRequest(input);
+    dispatch(myAction(input));
+    dispatch({ type: REQUEST });
   };
 
   console.log(state);
@@ -29,6 +22,30 @@ export const Test = () => {
     </>
   );
 };
+
+const myAction = params => (dispatch, mounted) => {
+  if (!params) return;
+  dispatch({ type: REQUEST, payload: params });
+
+  setTimeout(() => {
+    if (!mounted.current) return;
+    dispatch({ type: REQUEST_SUCCESS, payload: params });
+  }, 2000);
+};
+
+function useAsyncReducer(reducer, initialState) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    return () => (mounted.current = false);
+  }, []);
+
+  const dispatchFn = fn =>
+    typeof fn === 'function' ? fn(dispatch, mounted) : dispatch(fn);
+
+  return [state, dispatchFn];
+}
 
 const REQUEST = 'REQUEST';
 const REQUEST_SUCCESS = 'REQUEST_SUCCESS';
@@ -48,42 +65,4 @@ function reducer(state, action) {
     default:
       return state;
   }
-}
-
-function requestStart(params) {
-  return { type: REQUEST, payload: params };
-}
-
-function requestSuccess(response) {
-  return { type: REQUEST_SUCCESS, payload: response };
-}
-
-function requestError(response) {
-  return { type: REQUEST_ERROR, payload: response };
-}
-
-function request(params, responseCallback) {
-  const cancel = setTimeout(() => {
-    responseCallback('world', '');
-  }, 2000);
-
-  return () => {
-    console.log('REQUEST CANCELLED');
-    clearInterval(cancel);
-  };
-}
-
-function useGrpcRequest(func, dispatch, successFunc, errorFunc) {
-  const [params, setParams] = useState('');
-
-  const responseCallback = (response, error) =>
-    error ? dispatch(errorFunc(response)) : dispatch(successFunc(response));
-
-  useEffect(() => {
-    if (!params) return;
-    const cancel = func(params, responseCallback);
-    return () => cancel();
-  }, [params]);
-
-  return params => setParams(params);
 }

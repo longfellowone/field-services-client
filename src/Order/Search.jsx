@@ -93,8 +93,6 @@ const ResultList = React.memo(
     const lastResult = results.data.length === 0 ? true : false;
     if (results.data.length === 0) return null;
 
-    console.log('ResultList RENDER');
-
     return results.data.map((result, index) => (
       <Result
         key={result.productUuid}
@@ -117,7 +115,7 @@ const Result = ({
   setHighlightedIndex,
   setMenuHighlighted,
 }) => {
-  const markedName = replaceAt(indexesList.map(index => index.index), name);
+  const taggedResult = replaceAt(indexesList.map(index => index.index), name);
 
   const handleOnMouseEnter = e => {
     e.preventDefault();
@@ -134,17 +132,20 @@ const Result = ({
       style={highlightedIndex === index ? { background: '#f1f5f8' } : {}}
       onMouseEnter={handleOnMouseEnter}
     >
-      <div dangerouslySetInnerHTML={{ __html: markedName }} />
+      <div>{taggedResult}</div>
       <div>{uom}</div>
     </li>
   );
 };
 
-function replaceAt(indexArray, inputString) {
-  const string = [...inputString];
-  const startTag = '<span class="font-normal">';
-  const endTag = '</span>';
-  const tagAtIndex = i => string.splice(i, 1, startTag + string[i] + endTag);
-  indexArray.forEach(tagAtIndex);
-  return string.join('');
+function replaceAt(indexArray, string) {
+  const newString = [...string];
+  const replaceValue = i =>
+    (newString[i] = (
+      <span className="font-normal" key={i}>
+        {newString[i]}
+      </span>
+    ));
+  indexArray.map(replaceValue);
+  return newString;
 }
