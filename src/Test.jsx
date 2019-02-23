@@ -4,13 +4,11 @@ import { v4 as uuid } from 'uuid';
 
 export const Test = () => {
   const [input, setInput] = useState('hello');
-  const subscriptions = useRef([]);
-  const [state, dispatch] = useAsyncReducer(reducer, [], subscriptions);
-  subscriptions.current = [...state.subscriptions.map(sub => sub.fn)];
-
-  console.log(subscriptions.current);
+  const [state, dispatch] = useAsyncReducer(reducer, []);
 
   const handleOnClick = () => dispatch(myAction(input));
+
+  console.log(state);
 
   return (
     <>
@@ -22,15 +20,17 @@ export const Test = () => {
   );
 };
 
-const useAsyncReducer = (reducer, initialState, subscriptions) => {
-  initialState = { ...initialState, subscriptions: [] };
+const useAsyncReducer = (reducer, initialState) => {
+  initialState = { ...initialState, requests: [] };
+  const requests = useRef([]);
   const [state, dispatch] = useReducer(reducer, initialState);
+  requests.current = [...state.requests.map(request => request.fn)];
 
   useEffect(() => {
     console.clear();
-    return () => subscriptions.current.forEach(runUnsubscribeFn);
+    return () => requests.current.forEach(runCleanupFn);
   }, []);
-  const runUnsubscribeFn = fn => fn();
+  const runCleanupFn = fn => typeof fn === 'function' && fn();
   const dispatchFn = fn =>
     typeof fn === 'function' ? fn(dispatch) : dispatch(fn);
 
@@ -54,7 +54,7 @@ const myAction = params => dispatch => {
     clearInterval(request);
   };
 
-  dispatch({ type: REQUEST, unSubscribeFn: cancel, requestID: requestID });
+  dispatch({ type: REQUEST, cleanupFn: cancel, requestID: requestID });
 };
 
 const reducer = (state, action) => {
@@ -63,21 +63,14 @@ const reducer = (state, action) => {
       console.log(action.type);
       return {
         ...state,
-        subscriptions: addSubscription(
-          action.requestID,
-          action.unSubscribeFn,
-          state.subscriptions,
-        ),
+        requests: make(state.requests, action),
       };
     case REQUEST_SUCCESS:
       console.log(action.type);
       return {
         ...state,
         data: action.payload,
-        subscriptions: removeSubscription(
-          action.requestID,
-          state.subscriptions,
-        ),
+        requests: cleanup(state.requests, action),
       };
     case REQUEST_ERROR:
       console.log(action.type);
@@ -87,10 +80,10 @@ const reducer = (state, action) => {
   }
 };
 
-const removeSubscription = (requestID, subscriptions) =>
-  subscriptions.filter(sub => requestID !== sub.requestID);
+const cleanup = (requests, { requestID }) =>
+  requests.filter(sub => requestID !== sub.requestID);
 
-const addSubscription = (requestID, unSubscribeFn, subscriptions) => [
-  ...subscriptions,
-  { requestID: requestID, fn: unSubscribeFn },
+const make = (requests, { requestID, cleanupFn }) => [
+  ...requests,
+  { requestID: requestID, fn: cleanupFn },
 ];
