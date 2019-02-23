@@ -1,17 +1,16 @@
 import React, { useEffect, useReducer, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { v4 as uuid } from 'uuid';
 
 export const Test = () => {
+  const subscriptions = useRef([]);
   const [input, setInput] = useState('hello');
-  const [state, dispatch] = useAsyncReducer(reducer, { data: null });
-  useEffect(() => console.clear(), []);
+  const [state, dispatch] = useAsyncReducer(reducer, [], subscriptions);
+  subscriptions.current = [...state.subscriptions.map(sub => sub.fn)];
 
-  const handleOnClick = () => {
-    dispatch(myAction(input));
-    dispatch({ type: REQUEST });
-  };
+  console.log(subscriptions.current);
 
-  console.log(state);
+  const handleOnClick = () => dispatch(myAction(input));
 
   return (
     <>
@@ -23,46 +22,65 @@ export const Test = () => {
   );
 };
 
-const myAction = params => (dispatch, mounted) => {
-  if (!params) return;
-  dispatch({ type: REQUEST, payload: params });
-
-  setTimeout(() => {
-    if (!mounted.current) return;
-    dispatch({ type: REQUEST_SUCCESS, payload: params });
-  }, 2000);
-};
-
-function useAsyncReducer(reducer, initialState) {
+const useAsyncReducer = (reducer, initialState, subscriptions) => {
+  initialState = { ...initialState, subscriptions: [] };
   const [state, dispatch] = useReducer(reducer, initialState);
-  const mounted = useRef(true);
 
   useEffect(() => {
-    return () => (mounted.current = false);
+    console.clear();
+    return () => subscriptions.current.forEach(runUnsubscribeFn);
   }, []);
-
+  const runUnsubscribeFn = fn => fn();
   const dispatchFn = fn =>
-    typeof fn === 'function' ? fn(dispatch, mounted) : dispatch(fn);
+    typeof fn === 'function' ? fn(dispatch) : dispatch(fn);
 
   return [state, dispatchFn];
-}
+};
 
 const REQUEST = 'REQUEST';
 const REQUEST_SUCCESS = 'REQUEST_SUCCESS';
 const REQUEST_ERROR = 'REQUEST_ERROR';
 
-function reducer(state, action) {
+const myAction = params => dispatch => {
+  if (!params) return;
+  const requestID = uuid();
+
+  const request = setTimeout(() => {
+    dispatch({ type: REQUEST_SUCCESS, payload: params, requestID: requestID });
+  }, 2000);
+
+  const cancel = () => {
+    console.log('CANCELED: ' + requestID);
+    clearInterval(request);
+  };
+
+  dispatch({ type: REQUEST, unSubscribeFn: cancel, requestID: requestID });
+};
+
+const reducer = (state, action) => {
   switch (action.type) {
     case REQUEST:
-      console.log(action);
-      return state;
+      console.log(action.type);
+      return {
+        ...state,
+        subscriptions: [
+          ...state.subscriptions,
+          { fn: action.unSubscribeFn, requestID: action.requestID },
+        ],
+      };
     case REQUEST_SUCCESS:
-      console.log(action);
-      return { ...state, data: action.payload };
+      console.log(action.type);
+      return {
+        ...state,
+        data: action.payload,
+        subscriptions: state.subscriptions.filter(
+          sub => action.requestID !== sub.requestID,
+        ),
+      };
     case REQUEST_ERROR:
-      console.log(action);
+      console.log(action.type);
       return { ...state, error: action.payload };
     default:
       return state;
   }
-}
+};
