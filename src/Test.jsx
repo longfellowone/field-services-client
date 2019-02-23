@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 
 export const Test = () => {
-  const subscriptions = useRef([]);
   const [input, setInput] = useState('hello');
+  const subscriptions = useRef([]);
   const [state, dispatch] = useAsyncReducer(reducer, [], subscriptions);
   subscriptions.current = [...state.subscriptions.map(sub => sub.fn)];
 
@@ -63,18 +63,20 @@ const reducer = (state, action) => {
       console.log(action.type);
       return {
         ...state,
-        subscriptions: [
-          ...state.subscriptions,
-          { fn: action.unSubscribeFn, requestID: action.requestID },
-        ],
+        subscriptions: addSubscription(
+          action.requestID,
+          action.unSubscribeFn,
+          state.subscriptions,
+        ),
       };
     case REQUEST_SUCCESS:
       console.log(action.type);
       return {
         ...state,
         data: action.payload,
-        subscriptions: state.subscriptions.filter(
-          sub => action.requestID !== sub.requestID,
+        subscriptions: removeSubscription(
+          action.requestID,
+          state.subscriptions,
         ),
       };
     case REQUEST_ERROR:
@@ -84,3 +86,11 @@ const reducer = (state, action) => {
       return state;
   }
 };
+
+const removeSubscription = (requestID, subscriptions) =>
+  subscriptions.filter(sub => requestID !== sub.requestID);
+
+const addSubscription = (requestID, unSubscribeFn, subscriptions) => [
+  ...subscriptions,
+  { requestID: requestID, fn: unSubscribeFn },
+];
