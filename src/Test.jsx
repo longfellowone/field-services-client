@@ -4,11 +4,12 @@ import { v4 as uuid } from 'uuid';
 
 export const Test = () => {
   const [input, setInput] = useState('hello');
-  const [state, dispatch] = useAsyncReducer(reducer, []);
+  const [state, dispatch] = useAsyncReducer(reducer, { data: [] });
+  useEffect(() => console.clear(), []);
+
+  console.log(state.data);
 
   const handleOnClick = () => dispatch(myAction(input));
-
-  console.log(state);
 
   return (
     <>
@@ -27,7 +28,6 @@ const useAsyncReducer = (reducer, initialState) => {
   requests.current = [...state.requests.map(request => request.fn)];
 
   useEffect(() => {
-    console.clear();
     return () => requests.current.forEach(runCleanupFn);
   }, []);
   const runCleanupFn = fn => typeof fn === 'function' && fn();
@@ -39,7 +39,6 @@ const useAsyncReducer = (reducer, initialState) => {
 
 const REQUEST = 'REQUEST';
 const REQUEST_SUCCESS = 'REQUEST_SUCCESS';
-const REQUEST_ERROR = 'REQUEST_ERROR';
 
 const myAction = params => dispatch => {
   if (!params) return;
@@ -60,21 +59,18 @@ const myAction = params => dispatch => {
 const reducer = (state, action) => {
   switch (action.type) {
     case REQUEST:
-      console.log(action.type);
+      console.log(action);
       return {
         ...state,
         requests: make(state.requests, action),
       };
     case REQUEST_SUCCESS:
-      console.log(action.type);
+      console.log(action);
       return {
         ...state,
-        data: action.payload,
+        data: [...state.data, action.payload],
         requests: cleanup(state.requests, action),
       };
-    case REQUEST_ERROR:
-      console.log(action.type);
-      return { ...state, error: action.payload };
     default:
       return state;
   }
