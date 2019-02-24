@@ -6,14 +6,11 @@ import {
   ProductSearchRequest,
 } from './proto/supply_pb';
 
-export function useGrpcRequestv2(func, dispatch, errorFunc, successFunc) {
+export function useGrpcRequestv2(func, dispatch, delay) {
   const [params, setParams] = useState('');
   const [debouncedValue, setDebouncedValue] = useState(params);
-  const responseCallback = (error, response) =>
-    error ? dispatch(errorFunc(error)) : dispatch(successFunc(response));
 
-  // if (!delay) delay = 0;
-  let delay = 50;
+  if (!delay) delay = 0;
   useEffect(() => {
     if (!params) return;
     const handler = setTimeout(() => {
@@ -23,14 +20,14 @@ export function useGrpcRequestv2(func, dispatch, errorFunc, successFunc) {
   }, [params]);
 
   useEffect(() => {
-    const cancel = func(params, responseCallback);
+    const cancel = func(params, dispatch);
     return () => cancel();
   }, [debouncedValue]);
 
   return params => setParams(params);
 }
 
-export const productSearch = ({ name }, responseCallback) => {
+export const productSearch = ({ name }, dispatch) => {
   const request = new ProductSearchRequest();
   request.setName(name);
 
@@ -40,7 +37,10 @@ export const productSearch = ({ name }, responseCallback) => {
   const status = client.productSearch(
     request,
     { deadline: deadline.getTime() },
-    responseCallback,
+    (error, response) =>
+      error
+        ? dispatch({ type: 'searchError', payload: error })
+        : dispatch({ type: 'searchResponse', payload: response }),
   );
   return () => status.cancel();
 };
@@ -94,45 +94,3 @@ const client = new SupplyClient(
   null,
   null,
 );
-
-// export const useGrpcQuery = (func, params) => {
-//   const [state, setState] = useState({ data: [], loading: true });
-
-//   const success = data => {
-//     setState({ data: data, loading: false });
-//   };
-//   const error = error => {
-//     setState({ error: error.code, loading: false });
-//   };
-
-//   useEffect(() => {
-//     func(success, error, params);
-//   }, []);
-
-//   return [state.data, state.error, state.loading];
-// };
-
-// export const createOrder = ({ oid, pid }) => {
-//   const request = new CreateOrderRequest();
-//   request.setId(oid);
-//   request.setProjectId(pid);
-
-//   client.createOrder(request, {}, err => {});
-// };
-
-// const find = callback => {
-//   const request = new FindProjectOrderDatesRequest();
-//   request.setProjectId('pid1');
-
-//   const response = (err, res) => {
-//     err
-//       ? callback({ error: err, loading: false })
-//       : callback({
-//           data: res.toObject().ordersList.map(order => order),
-//           loading: false,
-//         });
-//   };
-
-//   const status = client.findProjectOrderDates(request, {}, response);
-//   return () => status.cancel();
-// };

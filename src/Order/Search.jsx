@@ -1,25 +1,20 @@
 import React, { useState, useReducer } from 'react';
 import { useGrpcRequestv2, productSearch } from '../api/ordering';
 import { searchReducer } from './reducer';
-import { searchResponse, searchError, SEARCH_RESET } from './actions';
 
 export const Search = () => {
   const [results, dispatch] = useReducer(searchReducer, { data: [] });
-  const makeSearchRequest = useGrpcRequestv2(
-    productSearch,
-    dispatch,
-    searchError,
-    searchResponse,
-  );
+  const makeSearchRequest = useGrpcRequestv2(productSearch, dispatch, 40);
   const [input, setInput] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
+  const resetSearch = () => dispatch({ type: 'searchReset' });
 
   const handleOnKeyDown = e => {
     if (results.data.length === 0) return;
     if (e.key === 'Escape') {
       e.preventDefault();
-      dispatch({ type: SEARCH_RESET });
+      resetSearch();
       setHighlightedIndex(0);
     }
     if (e.key === 'Tab') {
@@ -44,7 +39,7 @@ export const Search = () => {
     if (!menuHighlighted) {
       setHighlightedIndex(0);
     }
-    if (e.target.value === '') return dispatch({ type: SEARCH_RESET });
+    if (e.target.value === '') return resetSearch();
     makeSearchRequest({ name: e.target.value });
   };
 
