@@ -4,12 +4,13 @@ import { searchReducer } from './reducer';
 
 export const Search = () => {
   const [results, dispatch] = useReducer(searchReducer, { data: [] });
-  const makeSearchRequest = useGrpcRequestv2(productSearch, dispatch, 40);
+  const makeSearchRequest = useGrpcRequestv2(productSearch, dispatch);
   const [input, setInput] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
   const resetSearch = () => dispatch({ type: 'searchReset' });
 
+  console.log('0');
   const handleOnKeyDown = e => {
     if (results.data.length === 0) return;
     if (e.key === 'Escape') {

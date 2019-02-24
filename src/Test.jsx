@@ -7,7 +7,7 @@ export const Test = () => {
   const [state, dispatch] = useAsyncReducer(reducer, { data: [] });
   useEffect(() => console.clear(), []);
 
-  console.log(state.data);
+  console.log(state);
 
   const handleOnClick = () => dispatch(myAction(input));
 
@@ -38,6 +38,7 @@ const useAsyncReducer = (reducer, initialState) => {
 };
 
 const REQUEST = 'REQUEST';
+const REQUEST2 = 'REQUEST2';
 const REQUEST_SUCCESS = 'REQUEST_SUCCESS';
 
 const myAction = params => dispatch => {
@@ -53,12 +54,18 @@ const myAction = params => dispatch => {
     clearInterval(request);
   };
 
-  dispatch({ type: REQUEST, cleanupFn: cancel, requestID: requestID });
+  dispatch({ type: REQUEST, cleanupFn: cancel, requestID });
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case REQUEST:
+      console.log(action);
+      return {
+        ...state,
+        requests: make(state.requests, action),
+      };
+    case REQUEST2:
       console.log(action);
       return {
         ...state,

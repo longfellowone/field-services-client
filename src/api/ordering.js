@@ -5,27 +5,47 @@ import {
   FindOrderRequest,
   ProductSearchRequest,
 } from './proto/supply_pb';
+import { v4 as uuid } from 'uuid';
 
-export function useGrpcRequestv2(func, dispatch, delay) {
+const client = new SupplyClient(
+  'http://' + window.location.hostname + ':8080',
+  null,
+  null,
+);
+
+export const productSearchv2 = name => dispatch => {
+  if (!name) return;
+  const requestID = uuid();
+  const request = new ProductSearchRequest();
+  request.setName(name);
+
+  const deadline = new Date();
+  deadline.setSeconds(deadline.getSeconds() + 10);
+
+  const responseCallback = (error, response) => {
+    error
+      ? dispatch({ type: 'searchError', error, requestID })
+      : dispatch({ type: 'searchResponse', payload: response, requestID });
+  };
+
+  const status = client.productSearch(
+    request,
+    { deadline: deadline.getTime() },
+    responseCallback,
+  );
+  dispatch({ type: 'request', cleanupFn: status.cancel, requestID });
+};
+
+export const useGrpcRequestv2 = (func, dispatch) => {
   const [params, setParams] = useState('');
-  const [debouncedValue, setDebouncedValue] = useState(params);
-
-  if (!delay) delay = 0;
-  useEffect(() => {
-    if (!params) return;
-    const handler = setTimeout(() => {
-      setDebouncedValue(params);
-    }, delay);
-    return () => clearTimeout(handler);
-  }, [params]);
 
   useEffect(() => {
     const cancel = func(params, dispatch);
     return () => cancel();
-  }, [debouncedValue]);
+  }, [params]);
 
   return params => setParams(params);
-}
+};
 
 export const productSearch = ({ name }, dispatch) => {
   const request = new ProductSearchRequest();
@@ -88,9 +108,3 @@ export const findOrder = ({ oid }) =>
       err ? reject(err) : resolve(response.toObject());
     });
   });
-
-const client = new SupplyClient(
-  'http://' + window.location.hostname + ':8080',
-  null,
-  null,
-);
