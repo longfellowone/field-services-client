@@ -1,15 +1,45 @@
 import React, { useState } from 'react';
-import { useAsyncReducer, productSearchv3 } from '../api/ordering';
+import { useAsyncReducer } from '../api/ordering';
 import { searchReducer } from './reducer';
+
+import { Query } from 'react-apollo';
+import gql from 'graphql-tag';
+
+// const SEARCH_QUERY = gql`
+//   {
+//     products(name: "connector") {
+//       product {
+//         productID
+//         name
+//         category
+//         uom
+//       }
+//       matchedIndexes
+//     }
+//   }
+// `;
+
+const SEARCH_QUERY = gql`
+  query($input: String!) {
+    products(name: $input) {
+      product {
+        productID
+        name
+        category
+        uom
+      }
+    }
+  }
+`;
 
 export const Search = () => {
   const [state, dispatch] = useAsyncReducer(searchReducer, { results: [] });
-  const [input, setInput] = useState([]);
+  const [input, setInput] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
   const resetSearch = () => dispatch({ type: 'searchReset' });
 
-  console.log(state);
+  // console.log(state);
 
   const handleOnKeyDown = e => {
     if (state.results.length === 0) return;
@@ -41,7 +71,7 @@ export const Search = () => {
       setHighlightedIndex(0);
     }
     if (e.target.value === '') return resetSearch();
-    dispatch(productSearchv3(e.target.value));
+    // dispatch(productSearchv3(e.target.value));
   };
 
   const handleOnMouseLeave = e => {
@@ -53,6 +83,17 @@ export const Search = () => {
 
   return (
     <>
+      <Query query={SEARCH_QUERY} variables={{ input }}>
+        {({ data, loading, error }) => {
+          console.log(data, loading, error);
+          if (loading) return null;
+          if (error) return `${error}`;
+
+          // console.log(data);
+
+          return null;
+        }}
+      </Query>
       <div className="shadow-md rounded-lg border border-grey rounded-t-lg">
         <div className="py-1">
           <form action=".">
