@@ -1,18 +1,18 @@
-import React, { useState, useReducer } from 'react';
-import { useGrpcRequestv2, productSearch } from '../api/ordering';
+import React, { useState } from 'react';
+import { useAsyncReducer, productSearchv3 } from '../api/ordering';
 import { searchReducer } from './reducer';
 
 export const Search = () => {
-  const [results, dispatch] = useReducer(searchReducer, { data: [] });
-  const makeSearchRequest = useGrpcRequestv2(productSearch, dispatch);
+  const [state, dispatch] = useAsyncReducer(searchReducer, { results: [] });
   const [input, setInput] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
   const resetSearch = () => dispatch({ type: 'searchReset' });
 
-  console.log('0');
+  console.log(state);
+
   const handleOnKeyDown = e => {
-    if (results.data.length === 0) return;
+    if (state.results.length === 0) return;
     if (e.key === 'Escape') {
       e.preventDefault();
       resetSearch();
@@ -24,7 +24,7 @@ export const Search = () => {
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      if (highlightedIndex === results.data.length - 1) return;
+      if (highlightedIndex === state.results.length - 1) return;
       setHighlightedIndex(highlightedIndex => highlightedIndex + 1);
     }
     if (e.key === 'ArrowUp') {
@@ -41,7 +41,7 @@ export const Search = () => {
       setHighlightedIndex(0);
     }
     if (e.target.value === '') return resetSearch();
-    makeSearchRequest({ name: e.target.value });
+    dispatch(productSearchv3(e.target.value));
   };
 
   const handleOnMouseLeave = e => {
@@ -68,12 +68,9 @@ export const Search = () => {
             />
           </form>
         </div>
-        <ul
-          className="list-reset rounded-b-lg"
-          onMouseLeave={handleOnMouseLeave}
-        >
+        <ul className="list-reset rounded-b-lg" onMouseLeave={handleOnMouseLeave}>
           <ResultList
-            results={results}
+            results={state.results}
             highlightedIndex={highlightedIndex}
             setHighlightedIndex={setHighlightedIndex}
             setMenuHighlighted={setMenuHighlighted}
@@ -86,10 +83,9 @@ export const Search = () => {
 
 const ResultList = React.memo(
   ({ results, highlightedIndex, setHighlightedIndex, setMenuHighlighted }) => {
-    const lastResult = results.data.length === 0 ? true : false;
-    if (results.data.length === 0) return null;
+    const lastResult = results.length === 1 ? true : false;
 
-    return results.data.map((result, index) => (
+    return results.map((result, index) => (
       <Result
         key={result.productUuid}
         result={result}
@@ -111,7 +107,8 @@ const Result = ({
   setHighlightedIndex,
   setMenuHighlighted,
 }) => {
-  const taggedResult = replaceAt(indexesList.map(index => index.index), name);
+  const indexes = indexesList ? indexesList.map(index => index.index) : [];
+  const taggedResult = name ? replaceAt(indexes, name) : name;
 
   const handleOnMouseEnter = e => {
     e.preventDefault();

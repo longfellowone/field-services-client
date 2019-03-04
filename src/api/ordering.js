@@ -1,21 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer, useRef } from 'react';
 import { SupplyClient } from './proto/supply_grpc_web_pb';
 import {
   FindProjectOrderDatesRequest,
   FindOrderRequest,
   ProductSearchRequest,
 } from './proto/supply_pb';
-import { v4 as uuid } from 'uuid';
 
-const client = new SupplyClient(
-  'http://' + window.location.hostname + ':8080',
-  null,
-  null,
-);
+const client = new SupplyClient('http://' + window.location.hostname + ':8080', null, null);
 
-export const productSearchv2 = name => dispatch => {
+export const useAsyncReducer = (reducer, initialState) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    return () => (mounted.current = false);
+  }, []);
+
+  const dispatchFn = fn => (typeof fn === 'function' ? fn(dispatch, mounted) : dispatch(fn));
+
+  return [state, dispatchFn];
+};
+
+export const productSearchv3 = name => (dispatch, mounted) => {
   if (!name) return;
-  const requestID = uuid();
   const request = new ProductSearchRequest();
   request.setName(name);
 
@@ -23,48 +30,17 @@ export const productSearchv2 = name => dispatch => {
   deadline.setSeconds(deadline.getSeconds() + 10);
 
   const responseCallback = (error, response) => {
+    if (!mounted.current) return;
     error
-      ? dispatch({ type: 'searchError', error, requestID })
-      : dispatch({ type: 'searchResponse', payload: response, requestID });
+      ? dispatch({ type: 'searchError' })
+      : dispatch({
+          type: 'searchResponse',
+          results: response.toObject().resultsList.map(product => product),
+        });
   };
 
-  const status = client.productSearch(
-    request,
-    { deadline: deadline.getTime() },
-    responseCallback,
-  );
-  dispatch({ type: 'request', cleanupFn: status.cancel, requestID });
+  client.productSearch(request, { deadline: deadline.getTime() }, responseCallback);
 };
-
-export const useGrpcRequestv2 = (func, dispatch) => {
-  const [params, setParams] = useState('');
-
-  useEffect(() => {
-    const cancel = func(params, dispatch);
-    return () => cancel();
-  }, [params]);
-
-  return params => setParams(params);
-};
-
-export const productSearch = ({ name }, dispatch) => {
-  const request = new ProductSearchRequest();
-  request.setName(name);
-
-  const deadline = new Date();
-  deadline.setSeconds(deadline.getSeconds() + 1);
-
-  const status = client.productSearch(
-    request,
-    { deadline: deadline.getTime() },
-    (error, response) =>
-      error
-        ? dispatch({ type: 'searchError', payload: error })
-        : dispatch({ type: 'searchResponse', payload: response }),
-  );
-  return () => status.cancel();
-};
-
 // OLD
 export const useGrpcRequest = (func, setState) => {
   const [params, setParams] = useState(null);
@@ -93,9 +69,7 @@ export const findOrders = ({ pid }) =>
     request.setProjectId(pid);
 
     client.findProjectOrderDates(request, {}, (err, response) => {
-      err
-        ? reject(err)
-        : resolve(response.toObject().ordersList.map(order => order));
+      err ? reject(err) : resolve(response.toObject().ordersList.map(order => order));
     });
   });
 
