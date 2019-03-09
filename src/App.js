@@ -10,8 +10,7 @@ import { HttpLink } from 'apollo-link-http';
 import { ApolloProvider } from 'react-apollo';
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:8080/graphql',
-  // fetchOptions: { mode: 'no-cors' },
+  uri: 'http://192.168.0.104:8080/graphql',
 });
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link: httpLink, cache });
