@@ -146,27 +146,27 @@ function replaceAt(indexArray, string) {
 
 // Leading debounce, turn into hook
 // https://stackoverflow.com/questions/24004791/can-someone-explain-the-debounce-function-in-javascript
-function debounceish(delta, fn) {
-  var timer = null;
-  return function(e) {
-    if (timer === null) {
-      //Do now
-      fn(e);
-      //Set timer that does nothing (but is not null until it's done!)
-      timer = setTimeout(function() {
-        timer = null;
-      }, delta);
-    } else {
-      //Clear existing timer
-      clearTimeout(timer);
-      //Set a new one that actually does something
-      timer = setTimeout(function() {
-        fn(e);
-        //Set timer that does nothing again
-        timer = setTimeout(function() {
-          timer = null;
-        }, delta);
-      }, delta);
-    }
-  };
-}
+// function debounceish(delta, fn) {
+//   var timer = null;
+//   return function(e) {
+//     if (timer === null) {
+//       //Do now
+//       fn(e);
+//       //Set timer that does nothing (but is not null until it's done!)
+//       timer = setTimeout(function() {
+//         timer = null;
+//       }, delta);
+//     } else {
+//       //Clear existing timer
+//       clearTimeout(timer);
+//       //Set a new one that actually does something
+//       timer = setTimeout(function() {
+//         fn(e);
+//         //Set timer that does nothing again
+//         timer = setTimeout(function() {
+//           timer = null;
+//         }, delta);
+//       }, delta);
+//     }
+//   };
+// }

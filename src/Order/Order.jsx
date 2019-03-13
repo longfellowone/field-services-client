@@ -1,62 +1,76 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search } from './Search';
-import { useSpring, animated } from 'react-spring';
+// import { useSpring, animated } from 'react-spring';
+import { Query } from 'react-apollo';
+import gql from 'graphql-tag';
 
 export const Order = ({ match }) => {
-  const [order] = useState({});
-  const onLoad = useSpring({
-    color: 'white',
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    delay: '80',
-  });
-  // const id = match.params.id;
+  // const onLoad = useSpring({
+  //   color: 'white',
+  //   from: { opacity: 0 },
+  //   to: { opacity: 1 },
+  // });
+  // <animated.div style={onLoad}>
+  const id = match.params.id;
 
-  useEffect(() => {
-    // findOrderRequest({ oid: id });
-  }, []);
-
-  //const [order, error, loading] = useGrpcQuery(findOrder, { oid: id });
-  // if (error === 2) {
   //   createOrder({ oid: id, pid: 'pid1' });
-  // }
+  //
+
+  const FIND_ORDER = gql`
+    query($id: ID!) {
+      order(orderID: $id) {
+        items {
+          name
+          productID
+          uom
+          quantityRequested
+        }
+      }
+    }
+  `;
 
   return (
     <>
-      <animated.div style={onLoad}>
-        {/* {loading && <div>loading...</div>}
-      {error === 14 && <div>Cannot connect to server</div>}
-      {!error && !loading && <ItemList items={order.itemsList} />} */}
+      <div className="max-w-sm mx-auto px-2 sm:text-md mt-2">
+        <Query query={FIND_ORDER} variables={{ id }}>
+          {({ loading, error, data }) => {
+            if (loading) return null;
+            if (error) return `Error! ${error.message}`;
 
-        <div className="max-w-sm mx-auto px-2 sm:text-md mt-2">
-          {order.itemsList && (
-            <ul className="list-reset">
-              {order.itemsList && <ItemList items={order.itemsList} />}
-            </ul>
-          )}
-          {/* <div className="mb-1 mt-4 px-3">
-          Can't find what you're looking for? <u>Click Here</u>
-        </div> */}{' '}
-          <Search />
-        </div>
-      </animated.div>
+            console.log(data.order);
+
+            return (
+              <ul className="list-reset">
+                <ItemList items={data.order.items} />
+              </ul>
+            );
+          }}
+        </Query>
+
+        <Search />
+      </div>
     </>
   );
 };
 
 const ItemList = ({ items }) => {
-  return items.map(item => <Item key={item.productId} item={item} />);
+  return items.map(item => <Item key={item.productID} item={item} />);
 };
 
-const Item = ({ item: { productId, name, uom, quantityRequested } }) => {
-  if (quantityRequested === 0) {
-    quantityRequested = '';
-  }
+const Item = ({ item: { productID, name, uom, quantityRequested } }) => {
   const [input, setInput] = useState(quantityRequested);
 
-  const handleOnChange = e => {
+  if (quantityRequested === 0) setInput('');
+
+  const handleChange = e => {
     e.preventDefault();
     setInput(e.target.value);
+  };
+
+  const handleFocus = e => {
+    e.preventDefault();
+    if (!input) return; // Bug fix, text dissapears on iOS when re entering text after delete
+    e.target.select();
   };
 
   return (
@@ -64,9 +78,11 @@ const Item = ({ item: { productId, name, uom, quantityRequested } }) => {
       <div className="flex-1">{name}</div>
       <div className="flex">
         <input
-          onChange={handleOnChange}
           value={input}
-          className="bg-transparent appearance-none rounded-none border-none outline-none text-right text-black w-32 p-0 mr-1 sm:w-48"
+          name={productID}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          className="outline-none bg-transparent appearance-none rounded-none border-none text-right text-black w-32 p-0 pr-1 sm:w-48 "
           placeholder="Enter quantity... "
           pattern="[0-9]*"
           type="tel"

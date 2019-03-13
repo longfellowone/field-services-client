@@ -1,39 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { v4 } from 'uuid';
-import { useGrpcRequest, findOrders } from '../api/ordering';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
+import { Query } from 'react-apollo';
+import gql from 'graphql-tag';
+
 // https://www.npmjs.com/package/classnames
 // https://codesandbox.io/s/zr3mx12zzx?from-embed client context provider
 
-export const Dashboard = () => {
-  const [orders, setOrders] = useState([]);
-  const findOrdersRequest = useGrpcRequest(findOrders, setOrders);
-  const uuid = v4();
+const FIND_ORDERS = gql`
+  query($input: ID!) {
+    projectOrders(projectID: $input) {
+      orderID
+      sentDate
+    }
+  }
+`;
 
-  useEffect(() => {
-    findOrdersRequest({ pid: 'pid1' });
-  }, []);
+export const Dashboard = () => {
+  const uuid = v4();
+  const input = 'cf510766-faf7-415e-a067-0c5ae5cb2ae8';
 
   return (
-    <>
-      <a href={uuid}>New Order</a>
-      {/* {error && <div>Cannot connect to server</div>}
-      {loading && <div>loading...</div>} */}
-      {/* {error === 14 && <div>Cannot connect to server</div>} */}
-      <OrdersList orders={orders} />
-    </>
+    <Query query={FIND_ORDERS} variables={{ input }}>
+      {({ loading, error, data }) => {
+        if (loading) return null;
+        if (error) return `Error! ${error.message}`;
+
+        return (
+          <>
+            <a href={uuid}>New Order</a>
+            <OrdersList orders={data.projectOrders} />
+          </>
+        );
+      }}
+    </Query>
   );
 };
 
 const OrdersList = ({ orders }) => {
-  return orders.map(order => <OrderListItem key={order.id} order={order} />);
+  return orders.map(order => <OrderListItem key={order.orderID} order={order} />);
 };
 
-const OrderListItem = ({ order: { id, date } }) => {
+const OrderListItem = ({ order: { orderID, sentDate } }) => {
   return (
-    <Link to={id} key={id} className="flex">
-      <Moment date={date} format="MMMM Do YYYY h:mma" unix />{' '}
+    <Link to={orderID} key={orderID} className="flex">
+      <Moment date={sentDate} format="MMMM Do YYYY h:mma" unix />{' '}
     </Link>
   );
 };
