@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -13,97 +13,111 @@ const SEARCH_QUERY = gql`
   }
 `;
 
-export const Search = () => {
+export const Search = ({ addItem }) => {
   const [input, setInput] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleOnKeyDown = e => {
-    // if menu !open return
-    // if (state.results.length === 0) return;
-
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      // Set menu closed
-      setHighlightedIndex(0);
-    }
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      //Submit(e, highlightedIndex);
-    }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      // if (highlightedIndex === state.results.length - 1) return;
-      setHighlightedIndex(highlightedIndex => highlightedIndex + 1);
-    }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (highlightedIndex === 0) return;
-      setHighlightedIndex(highlightedIndex => highlightedIndex - 1);
-    }
-  };
-
-  const handleOnChange = e => {
-    e.preventDefault();
-    setInput(e.target.value);
-    if (!menuHighlighted) {
-      setHighlightedIndex(0);
-    }
-  };
-
-  const handleOnMouseLeave = e => {
-    e.preventDefault();
-    setMenuHighlighted(false);
-  };
-
-  const focusInput = input => input && input.focus();
+  const inputRef = useRef();
 
   return (
-    <div className="shadow-md rounded-lg border border-grey rounded-t-lg">
-      <div className="py-1">
-        <form action=".">
-          <input
-            value={input}
-            onChange={handleOnChange}
-            onKeyDown={handleOnKeyDown}
-            ref={focusInput}
-            className="w-full bg-transparent appearance-none text-black pl-3 py-2 border-none m-0 outline-none tap-none sm:text-md"
-            placeholder="Search for an item..."
-            tabIndex="0"
-            type="search"
+    <Query query={SEARCH_QUERY} variables={{ input }}>
+      {({ data, error }) => {
+        if (error) {
+          console.log(error);
+          return null;
+        }
+        if (Object.entries(data).length === 0) return null;
+
+        const handleKeyDown = e => {
+          if (!menuOpen) return;
+
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            setHighlightedIndex(0);
+            setMenuOpen(false);
+          }
+          if (e.key === 'ArrowDown' || e.key === 'Tab') {
+            e.preventDefault();
+            if (highlightedIndex === data.products.length - 1) return;
+            setHighlightedIndex(highlightedIndex => highlightedIndex + 1);
+          }
+          if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (highlightedIndex === 0) return;
+            setHighlightedIndex(highlightedIndex => highlightedIndex - 1);
+          }
+        };
+
+        const handleChange = e => {
+          e.preventDefault();
+          setInput(e.target.value);
+          setMenuOpen(true);
+          if (!menuHighlighted) {
+            setHighlightedIndex(0);
+          }
+        };
+
+        const handleMouseLeave = e => {
+          e.preventDefault();
+          setMenuHighlighted(false);
+        };
+
+        const handleSubmit = e => {
+          e.preventDefault();
+          setMenuOpen(false);
+          setInput('');
+          const product = data.products[highlightedIndex];
+          const productID = product.ID;
+          const name = product.name;
+          const uom = product.uom;
+          addItem({ variables: { productID, name, uom } });
+        };
+
+        const focusInput = input => input && input.focus();
+
+        const results = data.products.map((product, index) => (
+          <Result
+            key={product.ID}
+            result={product}
+            handleSubmit={handleSubmit}
+            index={index}
+            highlightedIndex={highlightedIndex}
+            setHighlightedIndex={setHighlightedIndex}
+            setMenuHighlighted={setMenuHighlighted}
           />
-        </form>
-      </div>
-      <ul className="list-reset rounded-b-lg overflow-hidden" onMouseLeave={handleOnMouseLeave}>
-        <Query query={SEARCH_QUERY} variables={{ input }}>
-          {({ data, error }) => {
-            if (error) {
-              console.log(error);
-              return null;
-            }
-            if (Object.entries(data).length === 0) return null;
+        ));
 
-            const results = data.products.map((product, index) => (
-              <Result
-                key={product.ID}
-                result={product}
-                index={index}
-                highlightedIndex={highlightedIndex}
-                setHighlightedIndex={setHighlightedIndex}
-                setMenuHighlighted={setMenuHighlighted}
-              />
-            ));
-
-            return results;
-          }}
-        </Query>
-      </ul>
-    </div>
+        return (
+          <div className="shadow-md rounded-lg border border-grey rounded-t-lg">
+            <div className="py-1">
+              <form action="." onSubmit={handleSubmit}>
+                <input
+                  ref={focusInput}
+                  value={input}
+                  onChange={handleChange}
+                  onKeyDown={handleKeyDown}
+                  className="w-full bg-transparent appearance-none text-black pl-3 py-2 border-none m-0 outline-none tap-none sm:text-md"
+                  placeholder="Search for an item..."
+                  tabIndex="0"
+                  type="search"
+                />
+              </form>
+            </div>
+            <ul className="list-reset rounded-b-lg overflow-hidden" onMouseLeave={handleMouseLeave}>
+              {menuOpen && results}
+            </ul>
+          </div>
+        );
+      }}
+    </Query>
   );
 };
 
 const Result = ({
   result: { name, uom, matchedIndexes },
+  handleSubmit,
   index,
   highlightedIndex,
   setHighlightedIndex,
@@ -112,7 +126,7 @@ const Result = ({
   const indexes = matchedIndexes ? matchedIndexes.map(i => i) : [];
   const taggedResult = name ? replaceAt(indexes, name) : name;
 
-  const handleOnMouseEnter = e => {
+  const handleMouseEnter = e => {
     e.preventDefault();
     setHighlightedIndex(index);
     setMenuHighlighted(true);
@@ -124,7 +138,8 @@ const Result = ({
     <li
       className={liClass}
       style={highlightedIndex === index ? { background: '#f1f5f8' } : {}}
-      onMouseEnter={handleOnMouseEnter}
+      onMouseEnter={handleMouseEnter}
+      onClick={handleSubmit}
     >
       <div>{taggedResult}</div>
       <div>{uom}</div>

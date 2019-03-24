@@ -1,65 +1,135 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
+import Modal from 'react-modal';
 
-const items = ['', '', ''];
+import './styles.css';
 
 export const Test2 = () => {
-  //   const list = items.map(() => {
-  //     return <Item key={Math.random()} />;
-  //   });
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  //   return list;
-  return <Item key={Math.random()} />;
+  console.log(modalIsOpen);
+
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
+
+  return (
+    <>
+      <div className="container">
+        <div className="box">
+          <Search />
+        </div>
+        {/* <Results /> */}
+        <div className="box item">
+          <div className="name" onClick={openModal}>
+            Product1
+          </div>
+          <Quantity />
+        </div>
+        <div className="box item">
+          <div className="name">Product2</div>
+          <Quantity />
+        </div>
+        <div className="box item">
+          <div className="name">Product3</div>
+          <Quantity />
+        </div>
+        <button className="submit">Send Order</button>
+      </div>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        className="modal"
+        contentLabel="Example Modal"
+      >
+        <button onClick={closeModal}>Close Modal</button>
+        My Text My TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy
+        TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy
+        TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy Text
+      </Modal>
+    </>
+  );
 };
 
-const Item = () => {
-  const [input, setInput] = useState('000000');
-  const [input2, setInput2] = useState('000000');
+const Results = () => {
+  return (
+    <>
+      <div className="results">
+        <div className="result">
+          <div className="name">Result1</div>
+          <div className="uom">ea</div>
+        </div>
+        <div className="result">
+          <div className="name">Result2</div>
+          <div className="uom">ft</div>
+        </div>
+        <div className="result">
+          <div className="name">Result3</div>
+          <div className="uom">ea</div>
+        </div>
+        <div className="result">
+          <div className="name">Result4</div>
+          <div className="uom">ea</div>
+        </div>
+      </div>
+    </>
+  );
+};
 
-  const handleChange = e => {
-    e.preventDefault();
-    if (e.target.value === '') {
-      setInput(null);
-    }
-    setInput(e.target.value);
+const Search = () => {
+  return (
+    <>
+      <form action=".">
+        <div className="search">
+          <input maxLength="70" placeholder="Start typing to begin search..." type="search" />
+        </div>
+      </form>
+    </>
+  );
+};
+
+const Quantity = () => {
+  const [input, setInput] = useState('90');
+  const [editable, setEditable] = useState(false);
+
+  const focusInput = input => input && input.focus();
+
+  const handleBlur = () => {
+    setEditable(false);
   };
 
-  const handleChange2 = e => {
-    e.preventDefault();
-    setInput2(e.target.value);
+  const handleChange = e => {
+    setInput(e.target.value);
   };
 
   const handleFocus = e => {
     e.preventDefault();
-    // inputRef.current.setSelectionRange(100, 100);
-    if (!input) return;
     e.target.select();
-    // console.log(e.target.selectionStart);
   };
 
-  return (
+  return editable ? (
     <>
-      <input
-        value={input}
-        onChange={handleChange}
-        onFocus={handleFocus}
-        className="bg-blue text-left text-black p-4"
-        // style={{ background: 'blue', color: 'white', padding: '20px' }}
-        placeholder="Enter quantity... "
-      />
-      <span style={{ color: 'black' }}>{input}</span>
-      <br />
-      <br />
-      <input
-        value={input2}
-        onChange={handleChange2}
-        onFocus={handleFocus}
-        className="bg-blue text-left text-black p-4"
-        // style={{ background: 'blue', color: 'white', padding: '20px' }}
-        placeholder="Enter quantity... "
-      />
-      <span style={{ color: 'black' }}>{input2}</span>
-      <br />
-      <br />
+      <div className="quantity">
+        <input
+          value={input}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          ref={focusInput}
+          pattern="[0-9]*"
+          type="tel"
+          autoComplete="off"
+          maxLength="6"
+        />
+      </div>
+      <div className="uom">ft</div>
+    </>
+  ) : (
+    <>
+      <div className="quantity" onClick={() => setEditable(true)}>
+        {input}
+      </div>
+      <div className="uom">ft</div>
     </>
   );
 };
+
+Modal.setAppElement('#root');
