@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -18,8 +18,6 @@ export const Search = ({ addItem }) => {
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [menuHighlighted, setMenuHighlighted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const inputRef = useRef();
 
   return (
     <Query query={SEARCH_QUERY} variables={{ input }}>

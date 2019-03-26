@@ -38,7 +38,6 @@ input {
 .item {
   display: flex;
   align-items: center;
-  height: 2.25rem;
   padding: 0.6rem;
 }
 
@@ -51,6 +50,7 @@ input {
   text-align: right;
   width: 3rem;
   background: white;
+  height: 1rem;
 }
 
 .item > .uom {
@@ -64,8 +64,8 @@ input {
 }
 
 .search {
-  padding-left: 0.6rem;
-  height: 2.25rem;
+  max-width: 400px;
+  margin: 0px auto;
 }
 
 .search > input {
@@ -73,65 +73,46 @@ input {
   appearance: none;
   width: 100%;
   background: white;
-  margin: 0.6rem 0 0.6rem 0;
+  margin: 0.3rem 0;
+  padding: 0.3rem;
+  padding-left: 0.6rem;
 }
 
-.results {
-  box-sizing: border-box;
+.menuopen {
+  position: fixed;
   width: 100%;
-  position: absolute;
+  height: 100%;
+  top: 0px;
+  left: 0px;
   background: white;
-  border-bottom-right-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
-  border: 1px solid #b8c2cc;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  margin-top: 0.3rem;
+  /* z-index: 989; */
 }
 
 .result {
-  border-bottom: 1px solid #b8c2cc;
-  display: flex;
-  align-items: center;
-  height: 2.25rem;
   padding: 0.6rem;
+  display: flex;
 }
 
-.result:last-child {
-  border: none;
+.result:first-child {
+  border-top: 1px solid #b8c2cc;
 }
 
 .result > .uom {
-  text-align: right;
+  width: 1rem;
+  text-align: left;
   font-weight: 700;
 }
 
 .submit {
   width: 100%;
-  height: 2.25rem;
   color: white;
   background-color: green;
   text-align: center;
   border-radius: 0.5rem;
   border: 1px solid #8795a1;
   overflow: hidden;
+  padding: 0.6rem;
   margin-top: 0.3rem;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
-}
-
-.modal {
-  position: absolute;
-  max-width: 400px;
-  left: 50%;
-  top: 0.3rem;
-  right: auto;
-  margin-right: -50%;
-  transform: translateX(-50%);
-  /* padding: 0.5rem; */
-  background-color: white;
-  border-radius: 0.5rem;
-  border: 1px solid #b8c2cc;
-  box-sizing: border-box;
-}
-
-.modal:focus {
-  outline: none;
 }

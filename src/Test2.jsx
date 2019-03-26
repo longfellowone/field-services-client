@@ -1,27 +1,16 @@
 import React, { useState } from 'react';
-import Modal from 'react-modal';
 
 import './styles.css';
 
 export const Test2 = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-
-  console.log(modalIsOpen);
-
-  const openModal = () => setModalIsOpen(true);
-  const closeModal = () => setModalIsOpen(false);
-
   return (
     <>
       <div className="container">
         <div className="box">
           <Search />
         </div>
-        {/* <Results /> */}
         <div className="box item">
-          <div className="name" onClick={openModal}>
-            Product1
-          </div>
+          <div className="name">Product1</div>
           <Quantity />
         </div>
         <div className="box item">
@@ -34,54 +23,72 @@ export const Test2 = () => {
         </div>
         <button className="submit">Send Order</button>
       </div>
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        className="modal"
-        contentLabel="Example Modal"
-      >
-        <button onClick={closeModal}>Close Modal</button>
-        My Text My TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy
-        TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy
-        TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy TextMy Text
-      </Modal>
     </>
   );
 };
 
-const Results = () => {
+const Search = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleFocus = () => {
+    setMenuOpen(true);
+  };
+
+  // const handleBlur = () => {
+  //   setMenuOpen(false);
+  // };
+
   return (
     <>
-      <div className="results">
-        <div className="result">
-          <div className="name">Result1</div>
-          <div className="uom">ea</div>
-        </div>
-        <div className="result">
-          <div className="name">Result2</div>
-          <div className="uom">ft</div>
-        </div>
-        <div className="result">
-          <div className="name">Result3</div>
-          <div className="uom">ea</div>
-        </div>
-        <div className="result">
-          <div className="name">Result4</div>
-          <div className="uom">ea</div>
+      <div className={menuOpen ? 'menuopen' : ''}>
+        <div className="search">
+          <input
+            maxLength="70"
+            placeholder="Start typing to begin search..."
+            onFocus={handleFocus}
+            // onBlur={handleBlur}
+          />
+          <Results menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
         </div>
       </div>
     </>
   );
 };
 
-const Search = () => {
+const Results = ({ setMenuOpen, menuOpen }) => {
+  const handleClick = () => {
+    setMenuOpen(false);
+    console.log('clicked');
+  };
+
   return (
     <>
-      <form action=".">
-        <div className="search">
-          <input maxLength="70" placeholder="Start typing to begin search..." type="search" />
+      <div style={{ display: menuOpen ? 'block' : 'none' }}>
+        <div className="result">
+          <div className="name" onClick={handleClick}>
+            Result1
+          </div>
+          <div className="uom">ea</div>
         </div>
-      </form>
+        <div className="result">
+          <div className="name" onClick={handleClick}>
+            Result2
+          </div>
+          <div className="uom">ft</div>
+        </div>
+        <div className="result">
+          <div className="name" onClick={handleClick}>
+            Result3
+          </div>
+          <div className="uom">ea</div>
+        </div>
+        <div className="result">
+          <div className="name" onClick={handleClick}>
+            Result4
+          </div>
+          <div className="uom">ea</div>
+        </div>
+      </div>
     </>
   );
 };
@@ -114,10 +121,7 @@ const Quantity = () => {
           onFocus={handleFocus}
           onBlur={handleBlur}
           ref={focusInput}
-          pattern="[0-9]*"
-          type="tel"
-          autoComplete="off"
-          maxLength="6"
+          placeholder="0"
         />
       </div>
       <div className="uom">ft</div>
@@ -131,5 +135,3 @@ const Quantity = () => {
     </>
   );
 };
-
-Modal.setAppElement('#root');
